@@ -1,11 +1,11 @@
 {
-	"name": "Test NFT Wearable",
-	"description": "This is a test to see if this is readable…",
-	"image": "ipfs://QmXEvEPKCpMLdcU4kvXKTF3r4upQ4QjQmLY1dVtrm7QBAc",
+  "name": "Test NFT Wearable",
+  "description": "This is a test to see if this is readable…",
+  "image": "ipfs://QmXEvEPKCpMLdcU4kvXKTF3r4upQ4QjQmLY1dVtrm7QBAc",
   "decimals": 0,
-	"properties": {
-		"wearables": {
+  "properties": {
+    "wearables": {
       "vrm": "ipfs://QmP1KYseVJpv16XX4Aa3VzKE72mMnsjAw7cuLTXtfZJVdV"
     }
-	}
+  }
 }
