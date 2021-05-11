@@ -6,7 +6,6 @@ import {
 import { Purpose, Sender } from "../generated/schema"
 
 export function handleSetPurpose(event: SetPurpose): void {
-
   let senderString = event.params.sender.toHexString()
 
   let sender = Sender.load(senderString)

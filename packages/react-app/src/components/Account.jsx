@@ -1,9 +1,9 @@
-import React from "react";
-import { Button } from "antd";
-import Address from "./Address";
-import Balance from "./Balance";
-import Wallet from "./Wallet";
-import { useThemeSwitcher } from "react-css-theme-switcher";
+import React from "react"
+import { Button } from "antd"
+import Address from "./Address"
+import Balance from "./Balance"
+import Wallet from "./Wallet"
+import { useThemeSwitcher } from "react-css-theme-switcher"
 
 /*
   ~ What it does? ~
@@ -64,7 +64,7 @@ export default function Account({
         >
           logout
         </Button>,
-      );
+      )
     } else {
       modalButtons.push(
         <Button
@@ -77,26 +77,26 @@ export default function Account({
         >
           connect
         </Button>,
-      );
+      )
     }
   }
 
-  const { currentTheme } = useThemeSwitcher();
+  const { currentTheme } = useThemeSwitcher()
 
   const display = minimized ? (
     ""
   ) : (
     <span>
-      {address ? <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
+      {address ? <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting…"}
       <Balance address={address} provider={localProvider} price={price} />
-      <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} color={currentTheme == "light" ? "#1890ff" : "#2caad9"} />
+      <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} color={currentTheme === "light" ? "#1890ff" : "#2caad9"} />
     </span>
-  );
+  )
 
   return (
     <div>
       {display}
       {modalButtons}
     </div>
-  );
+  )
 }

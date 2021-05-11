@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Input } from "antd";
-const { utils, constants } = require("ethers");
+import React, { useState, useEffect } from "react"
+import { Input } from "antd"
+const { utils, constants } = require("ethers")
 
 /*
   ~ What it does? ~
@@ -14,7 +14,7 @@ const { utils, constants } = require("ethers");
     value={"scaffold-eth"}
     placeholder="Enter value..."
     onChange={value => {
-      setValue(value);
+      setValue(value)
     }}
   />
 
@@ -22,68 +22,61 @@ const { utils, constants } = require("ethers");
 
   - Provide value={value} to specify initial string
   - Provide placeholder="Enter value..." value for the input
-  - Control input change by onChange={value => { setValue(value);}}
+  - Control input change by onChange={value => { setValue(value)}}
 
 */
 
 export default function BytesStringInput(props) {
-  const [mode, setMode] = useState("STRING");
-  const [display, setDisplay] = useState();
-  const [value, setValue] = useState(constants.HashZero);
+  const [mode, setMode] = useState("STRING")
+  const [display, setDisplay] = useState()
+  const [value, setValue] = useState(constants.HashZero)
 
   // current value is the value in bytes32
-  const currentValue = typeof props.value !== "undefined" ? props.value : value;
+  const currentValue = typeof props.value !== "undefined" ? props.value : value
 
-  const option = title => {
-
-    return (
-      <div
-        style={{ cursor: "pointer" }}
-        onClick={() => {
-          if (mode === "STRING") {
-            setMode("BYTES32");
-            if (!utils.isHexString(currentValue)) {
-                /* in case user enters invalid bytes32 number, 
-                   it considers it as string and converts to bytes32 */
-                const changedValue = utils.formatBytes32String(currentValue);
-                setDisplay(changedValue);
-            }
-            else {
-                setDisplay(currentValue);
-            }
-            
-            
+  const option = (title) => (
+    <div
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        if (mode === "STRING") {
+          setMode("BYTES32")
+          if (!utils.isHexString(currentValue)) {
+              /* in case user enters invalid bytes32 number, 
+                  it considers it as string and converts to bytes32 */
+              const changedValue = utils.formatBytes32String(currentValue)
+              setDisplay(changedValue)
+          } else {
+              setDisplay(currentValue)
+          }
+        } else {
+          setMode("STRING")
+          if (currentValue && utils.isHexString(currentValue)) {
+            setDisplay(utils.parseBytes32String(currentValue))
           } 
           else {
-            setMode("STRING");
-            if (currentValue && utils.isHexString(currentValue)) {
-              setDisplay(utils.parseBytes32String(currentValue));
-            } 
-            else {
-              setDisplay(currentValue);
-            }
+            setDisplay(currentValue)
           }
-        }}
-      >
-        {title}
-      </div>
-    );
-  };
+        }
+      }}
+    >
+      {title}
+    </div>
+  )
 
-  let addonAfter;
+  let addonAfter
   if (mode === "STRING") {
-    addonAfter = option("STRING 🔀");
+    addonAfter = option("STRING 🔀")
   } else {
-    addonAfter = option("BYTES32 🔀");
+    addonAfter = option("BYTES32 🔀")
   }
 
   useEffect(
-    ()=>{
+    () => {
       if(!currentValue){
-        setDisplay("");
+        setDisplay("")
       }
     }
-  ,[ currentValue ])
+  , [currentValue])
 
   return (
     <Input
@@ -91,25 +84,25 @@ export default function BytesStringInput(props) {
       autoFocus={props.autoFocus}
       value={display}
       addonAfter={addonAfter}
-      onChange={async e => {
-        const newValue = e.target.value;
-        if (mode === "STRING") {
-          //const ethValue = parseFloat(newValue) / props.price;
-          //setValue(ethValue);
-          if (typeof props.onChange === "function") {
-            props.onChange(utils.formatBytes32String(newValue));
+      onChange={async (e) => {
+        const newValue = e.target.value
+        if(mode === "STRING") {
+          //const ethValue = parseFloat(newValue) / props.price
+          //setValue(ethValue)
+          if(typeof props.onChange === "function") {
+            props.onChange(utils.formatBytes32String(newValue))
           }
-          setValue(utils.formatBytes32String(newValue));
-          setDisplay(newValue);
+          setValue(utils.formatBytes32String(newValue))
+          setDisplay(newValue)
 
         } else {
-          if (typeof props.onChange === "function") {
-            props.onChange(newValue);
+          if(typeof props.onChange === "function") {
+            props.onChange(newValue)
           }
-          setValue(newValue);
-          setDisplay(newValue);
+          setValue(newValue)
+          setDisplay(newValue)
         }
       }}
     />
-  );
+  )
 }

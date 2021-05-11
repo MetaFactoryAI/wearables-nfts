@@ -59,7 +59,7 @@ export default function Balance(props) {
   const price = props.price || props.dollarMultiplier
 
   if (price && dollarMode) {
-    displayBalance = "$" + (floatBalance * price).toFixed(2);
+    displayBalance = "$" + (floatBalance * price).toLocaleString('en-US', { minimumFractionDigits: 2 })
   }
 
   return (

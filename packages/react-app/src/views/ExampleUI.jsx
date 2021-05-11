@@ -8,14 +8,14 @@ import { parseEther, formatEther } from "@ethersproject/units";
 
 export default function ExampleUI({purpose, setPurposeEvents, address, mainnetProvider, userProvider, localProvider, yourLocalBalance, price, tx, readContracts, writeContracts }) {
 
-  const [newPurpose, setNewPurpose] = useState("loading...");
+  const [newPurpose, setNewPurpose] = useState("loading…");
 
   return (
     <div>
       {/*
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
-      <div style={{border:"1px solid #cccccc", padding:16, width:400, margin:"auto",marginTop:64}}>
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
         <h2>Example UI:</h2>
 
         <h4>purpose: {purpose}</h4>
@@ -27,7 +27,7 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
           <Button onClick={()=>{
             console.log("newPurpose",newPurpose)
             /* look how you call setPurpose on your contract: */
-            tx( writeContracts.YourContract.setPurpose(newPurpose) )
+            tx( writeContracts.WearablesNFTs.setPurpose(newPurpose) )
           }}>Set Purpose</Button>
         </div>
 
@@ -53,7 +53,7 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
         <Divider/>
 
         {  /* use formatEther to display a BigNumber: */ }
-        <h2>Your Balance: {yourLocalBalance?formatEther(yourLocalBalance):"..."}</h2>
+        <h2>Your Balance: {yourLocalBalance ? formatEther(yourLocalBalance) : "…"}</h2>
 
         <div>OR</div>
 
@@ -77,7 +77,7 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
 
 
         {  /* use formatEther to display a BigNumber: */ }
-        <h2>Your Balance: {yourLocalBalance?formatEther(yourLocalBalance):"..."}</h2>
+        <h2>Your Balance: {yourLocalBalance ? formatEther(yourLocalBalance) : "…"}</h2>
 
         <Divider/>
 
@@ -85,38 +85,38 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
 
         Your Contract Address:
         <Address
-            address={readContracts?readContracts.YourContract.address:readContracts}
+            address={readContracts ? readContracts.WearablesNFTs.address : readContracts}
             ensProvider={mainnetProvider}
             fontSize={16}
         />
 
         <Divider />
 
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
+        <div style={{ margin: 8 }}>
+          <Button onClick={() => {
             /* look how you call setPurpose on your contract: */
-            tx( writeContracts.YourContract.setPurpose("🍻 Cheers") )
+            tx(writeContracts.WearablesNFTs.setPurpose("🍻 Cheers"))
           }}>Set Purpose to "🍻 Cheers"</Button>
         </div>
 
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
+        <div style={{ margin: 8 }}>
+          <Button onClick={() => {
             /*
               you can also just craft a transaction and send it to the tx() transactor
               here we are sending value straight to the contract's address:
             */
             tx({
-              to: writeContracts.YourContract.address,
+              to: writeContracts.WearablesNFTs.address,
               value: parseEther("0.001")
             });
             /* this should throw an error about "no fallback nor receive function" until you add it */
           }}>Send Value</Button>
         </div>
 
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
+        <div style={{ margin: 8 }}>
+          <Button onClick={() => {
             /* look how we call setPurpose AND send some value along */
-            tx( writeContracts.YourContract.setPurpose("💵 Paying for this one!",{
+            tx( writeContracts.WearablesNFTs.setPurpose("💵 Paying for this one!",{
               value: parseEther("0.001")
             }))
             /* this will fail until you make the setPurpose function payable */
@@ -124,13 +124,13 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
         </div>
 
 
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
+        <div style={{ margin: 8 }}>
+          <Button onClick={() => {
             /* you can also just craft a transaction and send it to the tx() transactor */
             tx({
-              to: writeContracts.YourContract.address,
+              to: writeContracts.WearablesNFTs.address,
               value: parseEther("0.001"),
-              data: writeContracts.YourContract.interface.encodeFunctionData("setPurpose(string)",["🤓 Whoa so 1337!"])
+              data: writeContracts.WearablesNFTs.interface.encodeFunctionData("setPurpose(string)",["🤓 Whoa so 1337!"])
             });
             /* this should throw an error about "no fallback nor receive function" until you add it */
           }}>Another Example</Button>
@@ -140,21 +140,21 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
 
       {/*
         📑 Maybe display a list of events?
-          (uncomment the event and emit line in YourContract.sol! )
+          (uncomment the event and emit line in WearablesNFTs.sol! )
       */}
-      <div style={{ width:600, margin: "auto", marginTop:32, paddingBottom:32 }}>
+      <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
         <h2>Events:</h2>
         <List
           bordered
           dataSource={setPurposeEvents}
           renderItem={(item) => {
             return (
-              <List.Item key={item.blockNumber+"_"+item.sender+"_"+item.purpose}>
+              <List.Item key={item.blockNumber + "_" + item.sender + "_" + item.purpose}>
                 <Address
-                    address={item[0]}
-                    ensProvider={mainnetProvider}
-                    fontSize={16}
-                  /> =>
+                  address={item[0]}
+                  ensProvider={mainnetProvider}
+                  fontSize={16}
+                /> →
                 {item[1]}
               </List.Item>
             )
@@ -164,61 +164,50 @@ export default function ExampleUI({purpose, setPurposeEvents, address, mainnetPr
 
 
       <div style={{ width:600, margin: "auto", marginTop:32, paddingBottom:256 }}>
-
         <Card>
-
           Check out all the <a href="https://github.com/austintgriffith/scaffold-eth/tree/master/packages/react-app/src/components" target="_blank" rel="noopener noreferrer">📦  components</a>
-
         </Card>
 
-        <Card style={{marginTop:32}}>
+        <Card style={{ marginTop: 32 }}>
 
           <div>
             There are tons of generic components included from <a href="https://ant.design/components/overview/" target="_blank" rel="noopener noreferrer">🐜  ant.design</a> too!
           </div>
 
-          <div style={{marginTop:8}}>
+          <div style={{ marginTop: 8 }}>
             <Button type="primary">
               Buttons
             </Button>
           </div>
 
-          <div style={{marginTop:8}}>
+          <div style={{ marginTop: 8 }}>
             <SyncOutlined spin />  Icons
           </div>
 
-          <div style={{marginTop:8}}>
+          <div style={{ marginTop: 8 }}>
             Date Pickers?
-            <div style={{marginTop:2}}>
+            <div style={{ marginTop: 2 }}>
               <DatePicker onChange={()=>{}}/>
             </div>
           </div>
 
-          <div style={{marginTop:32}}>
+          <div style={{ marginTop: 32 }}>
             <Slider range defaultValue={[20, 50]} onChange={()=>{}}/>
           </div>
 
-          <div style={{marginTop:32}}>
+          <div style={{ marginTop: 32 }}>
             <Switch defaultChecked onChange={()=>{}} />
           </div>
 
-          <div style={{marginTop:32}}>
+          <div style={{ marginTop: 32 }}>
             <Progress percent={50} status="active" />
           </div>
 
-          <div style={{marginTop:32}}>
+          <div style={{ marginTop: 32 }}>
             <Spin />
           </div>
-
-
         </Card>
-
-
-
-
       </div>
-
-
     </div>
-  );
+  )
 }

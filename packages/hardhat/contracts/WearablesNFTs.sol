@@ -14,12 +14,12 @@ contract WearablesNFTs is ERC1155 {
   mapping (uint256 => string) private _uris;
   uint256 _tokenCount = 0;
 
-  constructor() ERC1155("Single Metadata URI Is Not Used") public {
+  constructor() ERC1155("Single Metadata URI Is Not Used") {
   }
 
   function setPurpose(string memory newPurpose) public {
     purpose = newPurpose;
-    console.log(msg.sender,"set purpose to",purpose);
+    console.log(msg.sender, "set purpose to", purpose);
     emit SetPurpose(msg.sender, purpose);
   }
 
@@ -38,5 +38,9 @@ contract WearablesNFTs is ERC1155 {
     // require something to prevent unauthorized access?
     _uris[tokenId] = newuri;
     emit URI(newuri, tokenId);
+  }
+
+  function tokenCount() public view returns (uint256) {
+    return _tokenCount;
   }
 }

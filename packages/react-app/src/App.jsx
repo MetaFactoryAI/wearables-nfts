@@ -63,8 +63,7 @@ const localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv)
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork.blockExplorer
 
-
-function App(props) {
+export default (props) => {
   const mainnetProvider = (scaffoldEthProvider && scaffoldEthProvider._network) ? scaffoldEthProvider : mainnetInfura
 
   const [injectedProvider, setInjectedProvider] = useState()
@@ -115,10 +114,10 @@ function App(props) {
   const myMainnetDAIBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0x34aA3F359A9D614239015126635CE7732c18fDF3"])
 
   // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts,"YourContract", "purpose")
+  const purpose = useContractReader(readContracts, "WearablesNFTs", "purpose")
 
   //📟 Listen for broadcast events
-  const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1)
+  const setPurposeEvents = useEventListener(readContracts, "WearablesNFTs", "SetPurpose", localProvider, 1)
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth")
@@ -131,15 +130,15 @@ function App(props) {
   useEffect(()=>{
     if(DEBUG && mainnetProvider && address && selectedChainId && yourLocalBalance && yourMainnetBalance && readContracts && writeContracts && mainnetDAIContract) {
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________")
-      console.log("🌎 mainnetProvider",mainnetProvider)
-      console.log("🏠 localChainId",localChainId)
-      console.log("👩‍💼 selected address:",address)
-      console.log("🕵🏻‍♂️ selectedChainId:",selectedChainId)
-      console.log("💵 yourLocalBalance",yourLocalBalance?formatEther(yourLocalBalance):"…")
-      console.log("💵 yourMainnetBalance",yourMainnetBalance?formatEther(yourMainnetBalance):"…")
-      console.log("📝 readContracts",readContracts)
-      console.log("🌍 DAI contract on mainnet:",mainnetDAIContract)
-      console.log("🔐 writeContracts",writeContracts)
+      console.log("🌎 mainnetProvider", mainnetProvider)
+      console.log("🏠 localChainId", localChainId)
+      console.log("👩‍💼 selected address:", address)
+      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId)
+      console.log("💵 yourLocalBalance", yourLocalBalance?formatEther(yourLocalBalance):"…")
+      console.log("💵 yourMainnetBalance", yourMainnetBalance?formatEther(yourMainnetBalance):"…")
+      console.log("📝 readContracts", readContracts)
+      console.log("🌍 DAI contract on mainnet:", mainnetDAIContract)
+      console.log("🔐 writeContracts", writeContracts)
     }
   }, [mainnetProvider, address, selectedChainId, yourLocalBalance, yourMainnetBalance, readContracts, writeContracts, mainnetDAIContract])
 
@@ -147,12 +146,12 @@ function App(props) {
   let networkDisplay = ""
   if(localChainId && selectedChainId && localChainId != selectedChainId ) {
     networkDisplay = (
-      <div style={{zIndex: 2, position: 'absolute', right: 0, top: 60, padding: 16 }}>
+      <div style={{ zIndex: 2, position: 'absolute', right: 0, top: 60, padding: 16 }}>
         <Alert
           message="⚠️ Wrong Network"
           description={(
             <div>
-              You have <b>{NETWORK(selectedChainId).name}</b> selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
+              You have <b>{NETWORK(selectedChainId)?.name ?? "Unknown"}</b> selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
             </div>
           )}
           type="error"
@@ -342,7 +341,7 @@ function App(props) {
            <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
              <Button
                onClick={() => {
-                 window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+                 window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA")
                }}
                size="large"
                shape="round"
@@ -409,5 +408,3 @@ window.ethereum && window.ethereum.on('accountsChanged', (accounts) => {
     window.location.reload()
   }, 1)
 })
-
-export default App
