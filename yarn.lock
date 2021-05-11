@@ -14668,6 +14668,10 @@ opencollective-postinstall@^2.0.0:
   resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
   integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
 
+"openzeppelin-solidity@https://github.com/OpenZeppelin/openzeppelin-contracts":
+  version "4.1.0"
+  resolved "https://github.com/OpenZeppelin/openzeppelin-contracts#86694813099ba566f227b7d7a46c950baa364b64"
+
 opn@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/opn/-/opn-5.5.0.tgz#fc7164fab56d235904c51c3b27da6758ca3b9bfc"

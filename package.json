@@ -1,12 +1,11 @@
 {
-  "name": "@scaffold-eth/monorepo",
-  "version": "1.0.0",
+  "name": "nft-wearable",
+  "version": "0.1.0",
   "keywords": [
     "ethereum",
-    "react",
-    "uniswap",
-    "workspaces",
-    "yarn"
+    "virtual reality",
+    "nft",
+    "wearable"
   ],
   "private": true,
   "scripts": {
