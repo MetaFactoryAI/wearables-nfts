@@ -23,7 +23,7 @@ contract WearablesNFTs is ERC1155 {
     emit SetPurpose(msg.sender, purpose);
   }
 
-  function mint(address recipient, uint256 amount, string memory metadata, bytes memory data) internal virtual {
+  function mint(address recipient, uint256 amount, string memory metadata, bytes memory data) public virtual {
     _tokenCount += 1;
     uint256 id = _tokenCount;
     _mint(recipient, id, amount, data);

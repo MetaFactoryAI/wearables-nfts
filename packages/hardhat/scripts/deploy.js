@@ -6,7 +6,6 @@ const { utils } = require("ethers");
 const R = require("ramda");
 
 const main = async () => {
-
   console.log("\n\n 📡 Deploying...\n");
 
   const yourContract = await deploy("WearablesNFTs") // <-- add in constructor args like line 19 vvvv
