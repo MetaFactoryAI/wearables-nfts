@@ -8,7 +8,7 @@ const { Text } = Typography;
 
 const blockExplorerLink = (
   (address, blockExplorer) => (
-    `${blockExplorer || "https://etherscan.io/"}address/${address}`
+    `${blockExplorer ?? "https://etherscan.io/"}address/${address}`
   )
 )
 
@@ -30,47 +30,67 @@ export default (props) => {
   if(ens && !ens.startsWith("0x")) {
     displayAddress = ens
   } else if(props.size === "short") {
-    displayAddress += "…" + address.substr(-4)
+    displayAddress += `…${address.substr(-4)}`
   } else if(props.size === "long") {
     displayAddress = address
   }
 
-  const etherscanLink = blockExplorerLink(address, props.blockExplorer);
+  const etherscanLink = (
+    blockExplorerLink(address, props.blockExplorer)
+  )
   if (props.minimized) {
     return (
       <span style={{ verticalAlign: "middle" }}>
-        <a style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }} target="_blank" href={etherscanLink} rel="noopener noreferrer">
-          <Blockies seed={address.toLowerCase()} size={8} scale={2} />
+        <a
+          style={{
+            color: currentTheme === "light" ? "#222222" : "#ddd"
+          }}
+          href={etherscanLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Blockies
+            seed={address.toLowerCase()}
+            size={8}
+            scale={2}
+          />
         </a>
       </span>
     )
   }
 
-  let text;
-  if (props.onChange) {
-    text = (
-      <Text editable={{ onChange: props.onChange }} copyable={{ text: address }}>
-        <a style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }} target="_blank" href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
-      </Text>
-    )
-  } else {
-    text = (
-      <Text copyable={{ text: address }}>
-        <a style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }} target="_blank" href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
-      </Text>
-    )
+  const textProps = { copyable: { text: address } }
+  if(props.onChange) {
+    textProps.editable = { onChange: props.onChange }
   }
 
   return (
     <span>
       <span style={{ verticalAlign: "middle" }}>
-        <Blockies seed={address.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        <Blockies
+          seed={address.toLowerCase()}
+          size={8}
+          scale={props.fontSize ? props.fontSize / 7 : 4}
+        />
       </span>
-      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize ?? 28 }}>{text}</span>
+      <span style={{
+        verticalAlign: "middle",
+        paddingLeft: 5,
+        fontSize: props.fontSize ?? 28
+      }}>
+        <Text {...textProps}>
+          <a
+            style={{
+              color: currentTheme === "light" ? "#222222" : "#ddd"
+            }}
+            href={etherscanLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {displayAddress}
+          </a>
+        </Text>
+      </span>
     </span>
   )
 }

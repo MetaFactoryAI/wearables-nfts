@@ -1,5 +1,6 @@
 import React from "react"
-import { Button } from "antd"
+import { Button, Tooltip } from "antd"
+import { LogoutOutlined } from "@ant-design/icons"
 import { useThemeSwitcher } from "react-css-theme-switcher"
 import Address from "./Address"
 import Balance from "./Balance"
@@ -18,7 +19,6 @@ import Wallet from "./Wallet"
     localProvider={localProvider}
     userProvider={userProvider}
     mainnetProvider={mainnetProvider}
-    price={price}
     web3Modal={web3Modal}
     loadWeb3Modal={loadWeb3Modal}
     logoutOfWeb3Modal={logoutOfWeb3Modal}
@@ -32,7 +32,6 @@ import Wallet from "./Wallet"
   - Provide userProvider={userProvider} to display a wallet
   - Provide mainnetProvider={mainnetProvider} and your address will be replaced by ENS name
               (ex. "0xa870" => "user.eth")
-  - Provide price={price} of ether and get your balance converted to dollars
   - Provide web3Modal={web3Modal}, loadWeb3Modal={loadWeb3Modal}, logoutOfWeb3Modal={logoutOfWeb3Modal}
               to be able to log in/log out to/from existing accounts
   - Provide blockExplorer={blockExplorer}, click on address and get the link
@@ -44,7 +43,6 @@ export default ({
   userProvider,
   localProvider,
   mainnetProvider,
-  price,
   minimized,
   web3Modal,
   loadWeb3Modal,
@@ -56,19 +54,21 @@ export default ({
   if(web3Modal) {
     if(web3Modal.cachedProvider) {
       modalButtons.push(
-        <Button
-          key="logoutbutton"
-          style={{
-            verticalAlign: "top",
-            marginLeft: 8,
-            marginTop: 4,
-          }}
-          shape="round"
-          size="large"
-          onClick={logoutOfWeb3Modal}
-        >
-          logout
-        </Button>
+        <Tooltip placement="bottom" title="Logout">
+          <Button
+            key="logoutbutton"
+            style={{
+              verticalAlign: "top",
+              marginLeft: 8,
+              marginTop: 4,
+            }}
+            shape="round"
+            size="large"
+            onClick={logoutOfWeb3Modal}
+          >
+            <LogoutOutlined />
+          </Button>
+        </Tooltip>
       )
     } else {
       modalButtons.push(
@@ -94,16 +94,20 @@ export default ({
   const display = minimized ? null : (
     <span>
       {address ? (
-        <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+        <Address
+          address={address}
+          ensProvider={mainnetProvider}
+          blockExplorer={blockExplorer}
+          size="short"
+        />
       ) : (
         "Connecting…"
       )}
-      <Balance address={address} provider={localProvider} price={price} />
+      <Balance address={address} provider={localProvider}/>
       <Wallet
         address={address}
         provider={userProvider}
         ensProvider={mainnetProvider}
-        price={price}
         color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
       />
     </span>

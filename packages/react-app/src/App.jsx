@@ -19,6 +19,7 @@ import {
 import { Transactor } from "./helpers"
 import { formatEther } from "@ethersproject/units"
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants"
+import NFTCreator from "./views/NFTCreator"
 
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS['localhost'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
@@ -74,9 +75,21 @@ export default (props) => {
   // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts, "WearablesNFTs", "purpose")
 
-  //📟 Listen for broadcast events
-  const setPurposeEvents = useEventListener(readContracts, "WearablesNFTs", "SetPurpose", localProvider, 1)
-
+  const singleEvents = useEventListener({
+    contracts: readContracts,
+    name: "WearablesNFTs",
+    event: "TransferSingle",
+    provider: localProvider,
+    startBlock: 1
+  })
+  const batchEvents = useEventListener({
+    contracts: readContracts,
+    name: "WearablesNFTs",
+    event: "TransferBatch",
+    provider: localProvider,
+    startBlock: 1
+  })
+  console.info('UI', singleEvents, batchEvents)
   // const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth")
 
   useEffect(() => {
@@ -169,6 +182,11 @@ export default (props) => {
 
         <Switch>
           <Route exact path="/">
+            <NFTCreator
+              {...{ singleEvents, batchEvents }}
+            />
+          </Route>
+          <Route exact path="/create">
             <Contract
               name="WearablesNFTs"
               signer={userProvider.getSigner()}

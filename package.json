@@ -58,5 +58,8 @@
       "**/hardhat",
       "**/hardhat/**"
     ]
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.6.2"
   }
 }

@@ -1,36 +1,17 @@
 import { useState, useEffect } from "react";
 
-/*
-  ~ What it does? ~
-
-  Enables you to keep track of events 
-
-  ~ How can I use? ~
-
-  const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
-
-  ~ Features ~
-
-  - Provide readContracts by loading contracts (see more on ContractLoader.js)
-  - Specify the name of the contract, in this case it is "YourContract"
-  - Specify the name of the event in the contract, in this case we keep track of "SetPurpose" event
-  - Specify the provider 
-*/
-
-export default (
-  contracts, contractName, eventName,
-  provider, startBlock, args,
-) => {
+export default ({
+  contracts, name, event, provider, startBlock,
+}) => {
   const [updates, setUpdates] = useState([])
 
   useEffect(() => {
     if(provider && startBlock !== undefined) {
-      // if you want to read _all_ events from your contracts, set this to the block number it is deployed
       provider.resetEventsBlock(startBlock)
     }
-    if(contracts?.[contractName]) {
+    if(contracts?.[name]) {
       try {
-        contracts[contractName].on(eventName, (...args) => {
+        contracts[name].on(event, (...args) => {
           let blockNumber = args[args.length - 1].blockNumber
           setUpdates((messages) => ([
             Object.assign({ blockNumber }, args.pop().args),
@@ -38,15 +19,14 @@ export default (
           ]))
         })
         return () => {
-          contracts[contractName].removeListener(eventName);
-        };
+          contracts[name].removeListener(event)
+        }
       } catch (e) {
         console.error(e)
       }
     }
   }, [
-    provider, startBlock, contracts,
-    contractName, eventName
+    provider, startBlock, contracts, name, event,
   ])
 
   return updates

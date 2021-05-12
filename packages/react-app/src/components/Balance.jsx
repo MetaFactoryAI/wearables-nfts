@@ -29,52 +29,38 @@ import { useBalance } from "../hooks"
   - Provide price={price} of ether and get your balance converted to dollars
 */
 
+export default ({
+  provider, address, balance: input, value, size,
+}) => {
+  const balance = useBalance(provider, address)
+  let floatBalance = 0
+  let usingBalance = balance
 
-export default function Balance(props) {
-  const [dollarMode, setDollarMode] = useState(true);
-
-  const [listening, setListening] = useState(false);
-
-  const balance = useBalance(props.provider, props.address)
-
-  let floatBalance = parseFloat("0.00");
-
-  let usingBalance = balance;
-
-  if (typeof props.balance !== "undefined") {
-    usingBalance = props.balance;
+  if(input !== undefined) {
+    usingBalance = input
   }
-  if (typeof props.value !== "undefined") {
-    usingBalance = props.value;
+  if(value !== undefined) {
+    usingBalance = value
   }
 
-  if (usingBalance) {
-    const etherBalance = formatEther(usingBalance);
-    parseFloat(etherBalance).toFixed(2);
-    floatBalance = parseFloat(etherBalance);
+  if(usingBalance) {
+    const etherBalance = formatEther(usingBalance)
+    parseFloat(etherBalance).toFixed(2)
+    floatBalance = parseFloat(etherBalance)
   }
 
-  let displayBalance = floatBalance.toFixed(4);
-
-  const price = props.price || props.dollarMultiplier
-
-  if (price && dollarMode) {
-    displayBalance = "$" + (floatBalance * price).toLocaleString('en-US', { minimumFractionDigits: 2 })
-  }
+  let displayBalance = floatBalance.toExponential()
 
   return (
     <span
       style={{
         verticalAlign: "middle",
-        fontSize: props.size ? props.size : 24,
+        fontSize: size ? size : 24,
         padding: 8,
         cursor: "pointer",
-      }}
-      onClick={() => {
-        setDollarMode(!dollarMode);
       }}
     >
       {displayBalance}
     </span>
-  );
+  )
 }

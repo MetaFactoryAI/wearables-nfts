@@ -47,15 +47,14 @@ export default ({
       contract ? (
         Object.values(contract.interface.functions).filter(
           (fn) => (
-            fn.type === "function" && (!show || show?.includes(fn.name))
+            fn.type === "function"
+            && (!show || show?.includes(fn.name))
           )
         )
       ) : ([])
     ),
     [contract, show],
   )
-
-  console.info('DISP', contract, show, displayedContractFunctions)
 
   const [refreshRequired, triggerRefresh] = useState(false)
   const contractDisplay = displayedContractFunctions.map(
