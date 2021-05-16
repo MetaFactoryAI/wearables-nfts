@@ -17,9 +17,11 @@ import {
   Header, Account, Contract, GasGauge, ThemeSwitch,
 } from "./components"
 import { Transactor } from "./helpers"
-import { formatEther } from "@ethersproject/units"
+import { formatEther, parseEther } from "@ethersproject/units"
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants"
 import NFTCreator from "./views/NFTCreator"
+import NewNFT from "./views/NewNFT"
+import EditNFT from "./views/EditNFT"
 
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS['localhost'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
@@ -66,6 +68,7 @@ export default (props) => {
   const yourLocalBalance = useBalance(localProvider, address)
   const readContracts = useContractLoader(localProvider)
   const writeContracts = useContractLoader(userProvider)
+  const faucetTx = Transactor(localProvider, gasPrice)
 
   // // If you want to call a function on a new block
   // useOnBlock(mainnetProvider, () => {
@@ -89,14 +92,9 @@ export default (props) => {
     provider: localProvider,
     startBlock: 1
   })
-  console.info('UI', singleEvents, batchEvents)
-  // const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth")
 
   useEffect(() => {
-    if(
-      DEBUG && mainnetProvider && address && selectedChainId
-      && yourLocalBalance && readContracts && writeContracts
-    ) {
+    if(DEBUG) {
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________")
       console.log("🌎 mainnetProvider", mainnetProvider)
       console.log("🏠 localChainId", localChainId)
@@ -158,6 +156,26 @@ export default (props) => {
     setRoute(window.location.pathname)
   }, [setRoute])
 
+  let faucetHint = null
+  const [faucetClicked, setFaucetClicked] = useState(false)
+  if(!faucetClicked && localProvider?._network?.chainId === 31337 && yourLocalBalance && formatEther(yourLocalBalance) <= 0) {
+    faucetHint = (
+      <div style={{ padding: 16 }}>
+        <Button type="primary" onClick={() => {
+          faucetTx({
+            to: address,
+            value: parseEther("0.01"),
+          })
+          setFaucetClicked(true)
+        }}>
+          💰 Grab funds from the faucet ⛽️
+        </Button>
+      </div>
+    )
+  }
+
+
+
   return (
     <div className="App">
       <Header />
@@ -170,21 +188,32 @@ export default (props) => {
         >
           <Menu.Item key="/">
             <Link onClick={() => setRoute("/")} to="/">
-              Consumers
+              📺 Consumers
             </Link>
           </Menu.Item>
           <Menu.Item key="/create">
-            <Link onClick={() => setRoute("/create")} to="/">
-              Creators
+            <Link onClick={() => setRoute("/create")} to="/create">
+              🎨 Creators
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/new">
+            <Link onClick={() => setRoute("/new")} to="/new">
+              ➕ New
             </Link>
           </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/">
-            <NFTCreator
-              {...{ singleEvents, batchEvents }}
-            />
+            {writeContracts ? (
+              <NFTCreator
+                {...{ singleEvents, batchEvents }}
+                ensProvider={mainnetProvider}
+                contract={writeContracts?.WearablesNFTs}
+              />
+            ) : (
+              <p>Unable to retrieve contracts. ¿Have they been created?</p>
+            )}
           </Route>
           <Route exact path="/create">
             <Contract
@@ -195,6 +224,26 @@ export default (props) => {
               blockExplorer={blockExplorer}
             />
           </Route>
+          <Route exact path="/new">
+            {writeContracts ? (
+              <NewNFT
+                contract={writeContracts?.WearablesNFTs}
+                treasurer={address}
+              />
+            ) : (
+              <p>Unable to retrieve contracts. ¿Have they been created?</p>
+            )}
+          </Route>
+          <Route exact path="/edit/:id?">
+            {readContracts ? (
+              <EditNFT
+                {...{ tx }}
+                contract={readContracts?.WearablesNFTs}
+              />
+            ) : (
+              <p>Unable to retrieve contracts. ¿Have they been created?</p>
+            )}
+          </Route>
         </Switch>
       </BrowserRouter>
 
@@ -202,7 +251,11 @@ export default (props) => {
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{
-        position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10
+        position: "fixed",
+        textAlign: "right",
+        right: 0,
+        top: 0,
+        padding: 10,
       }}>
         <Account
           address={address}
@@ -214,6 +267,7 @@ export default (props) => {
           logoutOfWeb3Modal={logoutOfWeb3Modal}
           blockExplorer={blockExplorer}
         />
+        {faucetHint}
       </div>
 
       <div style={{

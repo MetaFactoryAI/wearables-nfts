@@ -13,7 +13,7 @@ const blockExplorerLink = (
 )
 
 export default (props) => {
-  const address = props.value || props.address
+  const address = props.value ?? props.address
   const ens = useLookupAddress(props.ensProvider, address)
   const { currentTheme } = useThemeSwitcher()
 
@@ -38,7 +38,7 @@ export default (props) => {
   const etherscanLink = (
     blockExplorerLink(address, props.blockExplorer)
   )
-  if (props.minimized) {
+  if(props.minimized) {
     return (
       <span style={{ verticalAlign: "middle" }}>
         <a
@@ -81,7 +81,7 @@ export default (props) => {
         <Text {...textProps}>
           <a
             style={{
-              color: currentTheme === "light" ? "#222222" : "#ddd"
+              color: currentTheme === "light" ? "#222" : "#DDD"
             }}
             href={etherscanLink}
             target="_blank"

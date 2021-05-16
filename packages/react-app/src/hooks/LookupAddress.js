@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { getAddress, isAddress } from "@ethersproject/address";
+import { useState, useEffect } from "react"
+import { getAddress, isAddress } from "@ethersproject/address"
 import { useLocalStorage } from "."
 
 // resolved if(name){} to not save "" into cache
@@ -20,53 +20,65 @@ import { useLocalStorage } from "."
 
 const lookupAddress = async (provider, address) => {
   if(isAddress(address)) {
-    //console.log(`looking up ${address}`)
     try {
       // Accuracy of reverse resolution is not enforced.
       // We then manually ensure that the reported ens name resolves to address
-      const reportedName = await provider.lookupAddress(address);
+      const reportedName = (
+        await provider.lookupAddress(address)
+      )
+      const resolvedAddress = (
+        await provider.resolveName(reportedName)
+      )
 
-      const resolvedAddress = await provider.resolveName(reportedName);
+      console.info('RR', reportedName, resolvedAddress)
 
-      if (getAddress(address) === getAddress(resolvedAddress)) {
-        return reportedName;
-      } else {
-        return getAddress(address)
+      if(
+        getAddress(address)
+        === getAddress(resolvedAddress)
+      ) {
+        return reportedName
       }
-    } catch (e) {
+      return getAddress(address)
+    } catch(e) {
       return getAddress(address)
     }
   }
-  return 0;
-};
+  return 0
+}
 
 const useLookupAddress = (provider, address) => {
-  const [ensName, setEnsName] = useState(address);
-  //const [ensCache, setEnsCache] = useLocalStorage('ensCache_'+address); Writing directly due to sync issues
+  const [ensName, setEnsName] = useState(address)
 
   useEffect(() => {
-
-    let cache = window.localStorage.getItem('ensCache_'+address);
+    let cache = window.localStorage.getItem(
+      `ensCache_${address}`
+    )
     cache = cache && JSON.parse(cache)
+    const cacheFor = 60 * 60 * 24 * 5 // 5 days
 
-    if( cache && cache.timestamp>Date.now()){
+    if(cache?.created_at + cacheFor > Date.now()) {
       setEnsName(cache.name)
-    }else{
-      if (provider) {
-        lookupAddress(provider, address).then((name) => {
-          if (name) {
-            setEnsName(name);
-            window.localStorage.setItem('ensCache_'+address, JSON.stringify({
-              timestamp:Date.now()+360000,
-              name:name
-            }))
+    } else {
+      if(provider) {
+        lookupAddress(provider, address).then(
+          (name) => {
+            if(name) {
+              setEnsName(name)
+              window.localStorage.setItem(
+                `ensCache_${address}`,
+                JSON.stringify({
+                  created_at: Date.now(),
+                  name: name,
+                })
+              )
+            }
           }
-        });
+        )
       }
     }
-  }, [provider, address, setEnsName]);
+  }, [provider, address, setEnsName])
 
-  return ensName;
-};
+  return ensName
+}
 
-export default useLookupAddress;
+export default useLookupAddress

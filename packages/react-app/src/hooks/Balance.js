@@ -18,19 +18,29 @@ import useOnBlock from "./OnBlock";
   - If no pollTime is passed, the balance will update on every new block
 */
 
-let DEBUG = false
+let DEBUG = true
 
-export default function useBalance(provider, address, pollTime = 0) {
-  const [balance, setBalance] = useState();
+export default (provider, address, pollTime = 0) => {
+  const [balance, setBalance] = useState()
 
-  const pollBalance = useCallback(async (provider, address) => {
-    if(provider && address) {
-      const newBalance = await provider.getBalance(address);
-      if(newBalance !== balance) {
-        setBalance(newBalance)
+  const pollBalance = useCallback(
+    async (provider, address) => {
+      if(provider && address) {
+        const newBalance = (
+          await provider.getBalance(address)
+        )
+        if(newBalance !== balance) {
+          setBalance(newBalance)
+        }
       }
-    }
-  }, [provider, address])
+    },
+    [provider, address],
+  )
+
+  useEffect(
+    () => { pollBalance(provider, address) },
+    [pollBalance]
+  )
 
   // Only pass a provider to watch on a block if there is no pollTime
   useOnBlock((pollTime === 0) && provider, () => {

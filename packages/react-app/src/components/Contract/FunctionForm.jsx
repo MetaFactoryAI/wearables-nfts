@@ -67,16 +67,16 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
             </div>
         </Tooltip>
       )
-    } else if(input.type == "uint256") {
+    } else if(input.type === "uint256") {
       buttons = (
-        <Tooltip placement="right" title={"* 10 ** 18"}>
+        <Tooltip placement="right" title="⨯ 10¹⁸">
           <div
             type="dashed"
             style={{ cursor: "pointer" }}
             onClick={async () => {
-              const formUpdate = { ...form };
+              const formUpdate = { ...form }
               formUpdate[key] = utils.parseEther(form[key])
-              setForm(formUpdate);
+              setForm(formUpdate)
             }}
           >
             ✴️
@@ -114,10 +114,10 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
   });
 
   const txValueInput = (
-    <div style={{ margin: 2 }} key={"txValueInput"}>
+    <div style={{ margin: 2 }} key="txValueInput">
       <Input
         placeholder="transaction value"
-        onChange={e => setTxValue(e.target.value)}
+        onChange={(e) => setTxValue(e.target.value)}
         value={txValue}
         addonAfter={
           <div>
@@ -160,7 +160,15 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
     inputs.push(txValueInput);
   }
 
-  const buttonIcon = functionInfo.type === "call" ? <Button style={{ marginLeft: -32 }}>Read 📡</Button> : <Button style={{ marginLeft: -32 }}>Send 💸</Button>
+  const buttonIcon = (
+    <Button style={{ marginLeft: -32 }}>
+      {functionInfo.type === 'call' ? (
+        'Read 📡'
+      ) : (
+        'Send 💸'
+      )}
+    </Button>
+  )
   inputs.push(
     <div style={{ cursor: "pointer", margin: 2 }} key="goButton">
       <Input
@@ -189,23 +197,23 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
                 } else if(!value && input.type === 'bytes') {
                   value = []
                 }
-                console.info('ID', input.type, value)
                 return value
               })
 
               let result
-              if(functionInfo.stateMutability === "view" || functionInfo.stateMutability === "pure") {
+              if(['view', 'pure'].includes(
+                functionInfo.stateMutability
+              )) {
                 const returned = await contractFunction(...args)
-                result = tryToDisplay(returned);
+                result = tryToDisplay(returned)
               } else {
-                const overrides = {};
+                const overrides = {}
                 if(txValue) {
-                  overrides.value = txValue; // ethers.utils.parseEther()
+                  overrides.value = txValue // ethers.utils.parseEther()
                 }
                 // Uncomment this if you want to skip the gas estimation for each transaction
                 // overrides.gasLimit = hexlify(1200000);
 
-                console.info('ARGS', args)
                 // console.log("Running with extras",extras)
                 const returned = await tx(contractFunction(...args, overrides))
                 result = tryToDisplay(returned)

@@ -6,7 +6,11 @@ import { SyncOutlined } from '@ant-design/icons'
 import { Address, Balance } from "../components"
 import { parseEther, formatEther } from "@ethersproject/units"
 
-export default function ExampleUI({purpose, setPurposeEvents, address, mainnetProvider, userProvider, localProvider, yourLocalBalance, price, tx, readContracts, writeContracts }) {
+export default function ExampleUI({
+  purpose, setPurposeEvents, address, mainnetProvider,
+  userProvider, localProvider, yourLocalBalance, price,
+  tx, readContracts, writeContracts
+}) {
 
   const [newPurpose, setNewPurpose] = useState("loading…");
 

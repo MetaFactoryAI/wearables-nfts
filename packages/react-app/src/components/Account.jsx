@@ -54,9 +54,8 @@ export default ({
   if(web3Modal) {
     if(web3Modal.cachedProvider) {
       modalButtons.push(
-        <Tooltip placement="bottom" title="Logout">
+        <Tooltip key="logoutbutton" placement="bottom" title="Logout">
           <Button
-            key="logoutbutton"
             style={{
               verticalAlign: "top",
               marginLeft: 8,
