@@ -31,7 +31,7 @@ export default ({
     return (
       <>
         <h2>No Tokens Have Been Created Yet</h2>
-        <Link to="/new">Create One</Link>
+        <Link to="/new"><Button>Create One</Button></Link>
       </>
     )
   }

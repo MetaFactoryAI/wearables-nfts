@@ -310,6 +310,6 @@ let _ = window?.ethereum?.on('chainChanged', (chainId) => (
 
 _ = window?.ethereum?.on('accountsChanged', (accounts) => (
   web3Modal.cachedProvider && (
-   setTimeout(() => window.location.reload(), 1)
+    setTimeout(() => window.location.reload(), 1)
   )
 ))

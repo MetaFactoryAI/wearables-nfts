@@ -8,19 +8,10 @@ import "hardhat/console.sol";
 import "openzeppelin-solidity/contracts/token/ERC1155/ERC1155.sol";
 
 contract WearablesNFTs is ERC1155 {
-  event SetPurpose(address sender, string purpose);
-
-  string public purpose = "Building Unstoppable Apps";
   mapping (uint256 => string) private _uris;
   uint256 _tokenCount = 0;
 
   constructor() ERC1155("Single Metadata URI Is Not Used") {
-  }
-
-  function setPurpose(string memory newPurpose) public {
-    purpose = newPurpose;
-    console.log(msg.sender, "set purpose to", purpose);
-    emit SetPurpose(msg.sender, purpose);
   }
 
   function mint(address recipient, uint256 amount, string memory metadata, bytes memory data) public virtual {
