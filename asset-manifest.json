@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/nft-wearable/static/css/main.3f37dc0e.chunk.css",
-    "main.js": "/nft-wearable/static/js/main.ed9d6600.chunk.js",
-    "main.js.map": "/nft-wearable/static/js/main.ed9d6600.chunk.js.map",
-    "runtime-main.js": "/nft-wearable/static/js/runtime-main.a3435d1d.js",
-    "runtime-main.js.map": "/nft-wearable/static/js/runtime-main.a3435d1d.js.map",
-    "static/css/2.e10332d9.chunk.css": "/nft-wearable/static/css/2.e10332d9.chunk.css",
-    "static/js/2.bc38b13b.chunk.js": "/nft-wearable/static/js/2.bc38b13b.chunk.js",
-    "static/js/2.bc38b13b.chunk.js.map": "/nft-wearable/static/js/2.bc38b13b.chunk.js.map",
+    "main.css": "/nft-wearable/static/css/main.0822dd34.chunk.css",
+    "main.js": "/nft-wearable/static/js/main.ea0a6437.chunk.js",
+    "main.js.map": "/nft-wearable/static/js/main.ea0a6437.chunk.js.map",
+    "runtime-main.js": "/nft-wearable/static/js/runtime-main.14906420.js",
+    "runtime-main.js.map": "/nft-wearable/static/js/runtime-main.14906420.js.map",
+    "static/css/2.d89e46c9.chunk.css": "/nft-wearable/static/css/2.d89e46c9.chunk.css",
+    "static/js/2.8217e021.chunk.js": "/nft-wearable/static/js/2.8217e021.chunk.js",
+    "static/js/2.8217e021.chunk.js.map": "/nft-wearable/static/js/2.8217e021.chunk.js.map",
     "index.html": "/nft-wearable/index.html",
-    "precache-manifest.65bc742ec39b3fdb9a1c0e5ee06279ba.js": "/nft-wearable/precache-manifest.65bc742ec39b3fdb9a1c0e5ee06279ba.js",
+    "precache-manifest.d45686bf4b749a816108c46de57641ee.js": "/nft-wearable/precache-manifest.d45686bf4b749a816108c46de57641ee.js",
     "service-worker.js": "/nft-wearable/service-worker.js",
-    "static/css/2.e10332d9.chunk.css.map": "/nft-wearable/static/css/2.e10332d9.chunk.css.map",
-    "static/css/main.3f37dc0e.chunk.css.map": "/nft-wearable/static/css/main.3f37dc0e.chunk.css.map",
-    "static/js/2.bc38b13b.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.bc38b13b.chunk.js.LICENSE.txt"
+    "static/css/2.d89e46c9.chunk.css.map": "/nft-wearable/static/css/2.d89e46c9.chunk.css.map",
+    "static/css/main.0822dd34.chunk.css.map": "/nft-wearable/static/css/main.0822dd34.chunk.css.map",
+    "static/js/2.8217e021.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.8217e021.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.a3435d1d.js",
-    "static/css/2.e10332d9.chunk.css",
-    "static/js/2.bc38b13b.chunk.js",
-    "static/css/main.3f37dc0e.chunk.css",
-    "static/js/main.ed9d6600.chunk.js"
+    "static/js/runtime-main.14906420.js",
+    "static/css/2.d89e46c9.chunk.css",
+    "static/js/2.8217e021.chunk.js",
+    "static/css/main.0822dd34.chunk.css",
+    "static/js/main.ea0a6437.chunk.js"
   ]
 }
