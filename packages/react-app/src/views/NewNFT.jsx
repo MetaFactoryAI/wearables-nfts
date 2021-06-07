@@ -4,6 +4,7 @@ import { Form, Input, Layout } from 'antd'
 export default ({ contract, treasurer: treasurerParam }) => {
   const [quantity, setQuantity] = useState(1)
   const [treasurer, setTreasurer] = useState(treasurerParam)
+  const [metadata, setMetadata] = useState('')
 
   const create = (evt) => {
     //evt.preventDefault()
@@ -11,7 +12,7 @@ export default ({ contract, treasurer: treasurerParam }) => {
       window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
     )
     if(enact) {
-      contract.mint(treasurer, quantity, `http://test.com/${(new Date()).toISOString()}`, [])
+      contract.mint(treasurer, quantity, metadata, [])
     }
   }
 
@@ -44,7 +45,16 @@ export default ({ contract, treasurer: treasurerParam }) => {
             }}
           />
         </Form.Item>
-        <Input type="submit" value="Create"/>
+        <Form.Item
+          label="Metadata"
+          rules={[{ required: true, message: 'Token metadata.' }]}
+        >
+          <Input
+            value={metadata}
+            onChange={(evt) => setMetadata(evt.target.value)}
+          />
+        </Form.Item>
+       <Input type="submit" value="Create"/>
       </Form>
     </Layout>
   )

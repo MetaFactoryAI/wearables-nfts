@@ -1,7 +1,7 @@
 {
   "name": "nft-wearable-app",
   "description": "NFTs encapsulating virtual wearable analogues for physical products.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://dysbulic.github.io/nft-wearable/",
   "license": "MIT",
   "browserslist": {
@@ -18,7 +18,12 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
+    "@apollo/client": "^3.3.19",
     "@apollo/react-hooks": "^4.0.0",
+    "@chakra-ui/icons": "^1.0.13",
+    "@chakra-ui/react": "^1.6.3",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "@ethersproject/address": "^5.0.5",
     "@ethersproject/bignumber": "^5.0.8",
     "@ethersproject/bytes": "^5.0.5",
@@ -43,8 +48,9 @@
     "dotenv": "^8.2.0",
     "eth-hooks": "^1.1.2",
     "ethers": "^5.0.31",
+    "framer-motion": "^4",
     "graphiql": "^1.0.5",
-    "graphql": "^15.3.0",
+    "graphql": "^15.5.0",
     "isomorphic-fetch": "^3.0.0",
     "node-watch": "^0.7.1",
     "postcss": "^8.2.6",

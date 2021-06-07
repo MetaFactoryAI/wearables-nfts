@@ -22,9 +22,11 @@ import { INFURA_ID, NETWORK, NETWORKS } from "./constants"
 import NFTCreator from "./views/NFTCreator"
 import NewNFT from "./views/NewNFT"
 import EditNFT from "./views/EditNFT"
+import Token from "./views/Token"
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS['localhost'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+// const targetNetwork = NETWORKS['localhost'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS['rinkeby'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true
@@ -174,8 +176,6 @@ export default (props) => {
     )
   }
 
-
-
   return (
     <div className="App">
       <Header />
@@ -243,6 +243,9 @@ export default (props) => {
             ) : (
               <p>Unable to retrieve contracts. ¿Have they been created?</p>
             )}
+          </Route>
+          <Route exact path="/token/:id?">
+            <Token ensProvider={mainnetProvider}/>
           </Route>
         </Switch>
       </BrowserRouter>

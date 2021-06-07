@@ -21,7 +21,8 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+// const defaultNetwork = "localhost";
+const defaultNetwork = "rinkeby";
 
 function mnemonic() {
   try {
@@ -153,7 +154,6 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
   .addOptionalParam("amount", "Amount of ETH to send to wallet after generating")
   .addOptionalParam("url", "URL to add pk to")
   .setAction(async (taskArgs, { network, ethers }) => {
-
     const randomWallet = ethers.Wallet.createRandom()
     const privateKey = randomWallet._signingKey().privateKey
     console.log("🔐 WALLET Generated as " + randomWallet.address + "")

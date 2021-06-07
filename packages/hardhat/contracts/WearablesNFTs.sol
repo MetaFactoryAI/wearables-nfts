@@ -25,7 +25,7 @@ contract WearablesNFTs is ERC1155 {
     return _uris[tokenId];
   }
 
-  function setURI(string memory newuri, uint256 tokenId) internal virtual {
+  function setURI(string memory newuri, uint256 tokenId) public virtual {
     // require something to prevent unauthorized access?
     _uris[tokenId] = newuri;
     emit URI(newuri, tokenId);
