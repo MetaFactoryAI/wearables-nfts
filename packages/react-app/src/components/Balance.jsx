@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { formatEther } from "@ethersproject/units";
-import { usePoller } from "eth-hooks";
-import { useBalance } from "../hooks"
+import React, { useState } from 'react'
+import { formatEther } from '@ethersproject/units'
+import { Text, Box, Flex, Image } from '@chakra-ui/react'
+import { useBalance } from '../hooks'
+import eth from '../eth.svg'
+
 
 /*
   ~ What it does? ~
@@ -49,18 +51,14 @@ export default ({
     floatBalance = parseFloat(etherBalance)
   }
 
-  let displayBalance = floatBalance.toExponential()
+  let displayBalance = (
+    floatBalance.toFixed(4)
+  )
 
   return (
-    <span
-      style={{
-        verticalAlign: "middle",
-        fontSize: size ? size : 24,
-        padding: 8,
-        cursor: "pointer",
-      }}
-    >
+    <Flex title={`${floatBalance} ETH`}>
       {displayBalance}
-    </span>
+      <Image src={eth} alt="ETH" h="0.9em" mt="4px" ml="2px"/>
+    </Flex>
   )
 }

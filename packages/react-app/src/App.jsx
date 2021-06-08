@@ -5,7 +5,11 @@ import {
   StaticJsonRpcProvider, JsonRpcProvider, Web3Provider,
 } from "@ethersproject/providers"
 import "./App.css"
-import { Row, Col, Button, Menu, Alert, Switch as SwitchD } from "antd"
+import { Row, Col, Button, Menu, Switch as SwitchD } from "antd"
+import {
+  Box, Alert, AlertIcon, AlertTitle, AlertDescription,
+  CloseButton, Tabs, TabList, TabPanels, Tab, TabPanel,
+} from '@chakra-ui/react'
 import Web3Modal from "web3modal"
 import WalletConnectProvider from "@walletconnect/web3-provider"
 import { useUserAddress } from "eth-hooks"
@@ -61,84 +65,39 @@ export default (props) => {
     )
   )
   const [injectedProvider, setInjectedProvider] = useState()
-  const gasPrice = useGasPrice(targetNetwork, "fast") // EtherGasStation
+  const gasPrice = useGasPrice(targetNetwork, 'fast') // EtherGasStation
   const userProvider = useUserProvider(injectedProvider, localProvider)
   const address = useUserAddress(userProvider)
   let localChainId = localProvider?._network?.chainId
   let selectedChainId = userProvider?._network?.chainId
   const tx = Transactor(userProvider, gasPrice)
-  const yourLocalBalance = useBalance(localProvider, address)
   const readContracts = useContractLoader(localProvider)
   const writeContracts = useContractLoader(userProvider)
-  const faucetTx = Transactor(localProvider, gasPrice)
 
-  // // If you want to call a function on a new block
-  // useOnBlock(mainnetProvider, () => {
-  //   console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`)
-  // })
-
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "WearablesNFTs", "purpose")
-
-  const singleEvents = useEventListener({
-    contracts: readContracts,
-    name: "WearablesNFTs",
-    event: "TransferSingle",
-    provider: localProvider,
-    startBlock: 1
-  })
-  const batchEvents = useEventListener({
-    contracts: readContracts,
-    name: "WearablesNFTs",
-    event: "TransferBatch",
-    provider: localProvider,
-    startBlock: 1
-  })
-
-  useEffect(() => {
-    if(DEBUG) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________")
-      console.log("🌎 mainnetProvider", mainnetProvider)
-      console.log("🏠 localChainId", localChainId)
-      console.log("👩‍💼 selected address:", address)
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId)
-      console.log(
-        "💵 yourLocalBalance",
-        yourLocalBalance ? formatEther(yourLocalBalance) : "…"
-      )
-      console.log("📝 readContracts", readContracts)
-      console.log("🔐 writeContracts", writeContracts)
-    }
-  }, [
-    mainnetProvider, address, selectedChainId,
-    yourLocalBalance, readContracts, writeContracts
-  ])
-
-  let networkDisplay
+  let NetworkDisplay = () => (
+    <Box
+      zIndex={1} position="absolute"
+      right="13em" top={5}
+      color={targetNetwork.color}
+    >
+      {targetNetwork.name}
+    </Box>
+  )
   if(localChainId && selectedChainId && localChainId != selectedChainId) {
-    networkDisplay = (
-      <div style={{
-        zIndex: 2, position: 'absolute', right: 0, top: 60, padding: 16,
-      }}>
-        <Alert
-          message="⚠️ Wrong Network"
-          description={(
-            <div>
-              You have <b>{NETWORK(selectedChainId)?.name ?? "Unknown"}</b> selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
-            </div>
-          )}
-          type="error"
-          closable={false}
-        />
-      </div>
-    )
-  } else {
-    networkDisplay = (
-      <div style={{
-        zIndex: -1, position: 'absolute', right: 154, top: 28, padding: 16, color: targetNetwork.color
-      }}>
-        {targetNetwork.name}
-      </div>
+    NetworkDisplay = () => (
+      <Box
+        zIndex={2} position="absolute"
+        right={0} top={5}
+      >
+        <Alert status="error" maxW="6em">
+          <AlertIcon />
+          <AlertTitle mr={2}>⚠️ Wrong Network:</AlertTitle>
+          <AlertDescription>
+            You have <b>{NETWORK(selectedChainId)?.name ?? "Unknown"}</b> selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
+          </AlertDescription>
+          <CloseButton position="absolute" right="8px" top="8px" />
+        </Alert>
+      </Box>
     )
   }
 
@@ -158,28 +117,10 @@ export default (props) => {
     setRoute(window.location.pathname)
   }, [setRoute])
 
-  let faucetHint = null
-  const [faucetClicked, setFaucetClicked] = useState(false)
-  if(!faucetClicked && localProvider?._network?.chainId === 31337 && yourLocalBalance && formatEther(yourLocalBalance) <= 0) {
-    faucetHint = (
-      <div style={{ padding: 16 }}>
-        <Button type="primary" onClick={() => {
-          faucetTx({
-            to: address,
-            value: parseEther("0.01"),
-          })
-          setFaucetClicked(true)
-        }}>
-          💰 Grab funds from the faucet ⛽️
-        </Button>
-      </div>
-    )
-  }
-
   return (
     <div className="App">
       <Header />
-      {networkDisplay}
+      <NetworkDisplay/>
       <BrowserRouter>
         <Menu
           style={{ textAlign: "center" }}
@@ -207,7 +148,6 @@ export default (props) => {
           <Route exact path="/">
             {writeContracts ? (
               <NFTCreator
-                {...{ singleEvents, batchEvents }}
                 ensProvider={mainnetProvider}
                 contract={writeContracts?.WearablesNFTs}
               />
@@ -244,7 +184,7 @@ export default (props) => {
               <p>Unable to retrieve contracts. ¿Have they been created?</p>
             )}
           </Route>
-          <Route exact path="/token/:id?">
+          <Route exact path="/token/:id">
             <Token
               {...{ address }}
               ensProvider={mainnetProvider}
@@ -256,37 +196,35 @@ export default (props) => {
 
       <ThemeSwitch />
 
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{
-        position: "fixed",
-        textAlign: "right",
-        right: 0,
-        top: 0,
-        padding: 10,
-      }}>
+      <Box
+        position="fixed"
+        textAlign="right"
+        right={0} top={0}
+        padding={10}
+      >
         <Account
-          address={address}
-          localProvider={localProvider}
-          userProvider={userProvider}
-          mainnetProvider={mainnetProvider}
-          web3Modal={web3Modal}
-          loadWeb3Modal={loadWeb3Modal}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer}
+          {...{ address,
+            localProvider,
+            userProvider,
+            mainnetProvider,
+            web3Modal,
+            loadWeb3Modal,
+            logoutOfWeb3Modal,
+            blockExplorer,
+          }}
         />
-        {faucetHint}
-      </div>
+      </Box>
 
-      <div style={{
-        position: "fixed", textAlign: "left",
-        left: 0, bottom: 20, padding: 10,
-      }}>
+      <Box
+        position="fixed" textAlign="left"
+        left={0} bottom={0} padding={10}
+      >
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
             <GasGauge gasPrice={gasPrice} />
           </Col>
         </Row>
-      </div>
+      </Box>
     </div>
   )
 }

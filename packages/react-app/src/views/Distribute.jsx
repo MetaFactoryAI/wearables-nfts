@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader,
   ModalCloseButton, ModalBody, ModalFooter,
@@ -14,6 +14,7 @@ export default ({
 }) => {
   const [raw, setRaw] = useState('')
   const [addresses, setAddresses] = useState([])
+  const text = useRef()
   const update = (input) => {
     setRaw(input)
     setAddresses(
@@ -46,7 +47,7 @@ export default ({
             <FormLabel>Comma Separated ETH Addresses</FormLabel>
             <Textarea
               placeholder="Enter space, semicolon, or comma separated eth addresses."
-              value={raw} minH="6em"
+              ref={text} value={raw} minH="6em"
               onChange={evt => update(evt.target.value)}
             />
             <FormHelperText>Each address will get one token.</FormHelperText>
@@ -68,10 +69,12 @@ export default ({
   )
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={text}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Distribute {addresses.length} / {quantity} Tokens</ModalHeader>
+        <ModalHeader>
+          Distribute {addresses.length} / {quantity} Tokens
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <InputTabs/>

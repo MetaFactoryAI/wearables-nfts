@@ -101,9 +101,7 @@ export default ({ ensProvider, address, contract }) => {
               /></Td>
               <Td>
                 {account.toLowerCase() === address.toLowerCase() && (
-                  <Box onClick={config} title="Distribute">
-                    <Image src={sprinkler} alt="Dist"/>
-                  </Box>
+                  <Button onClick={config}>Distribute</Button>
                 )}
               </Td>
             </Tr>

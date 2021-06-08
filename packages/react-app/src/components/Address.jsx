@@ -1,9 +1,9 @@
-import React from "react"
-import Blockies from "react-blockies"
-import { Typography, Skeleton } from "antd"
-import { Flex, Box, Text } from '@chakra-ui/react'
-import { useLookupAddress } from "../hooks"
-import { useThemeSwitcher } from "react-css-theme-switcher"
+import React from 'react'
+import Blockies from 'react-blockies'
+import {
+  Flex, Box, Text, Stack, SkeletonText, SkeletonCircle,
+} from '@chakra-ui/react'
+import { useLookupAddress } from '../hooks'
 
 const blockExplorerLink = (
   (address, blockExplorer) => (
@@ -12,15 +12,16 @@ const blockExplorerLink = (
 )
 
 export default (props) => {
+  const { SecondLine } = props
   const address = props.value ?? props.address
   const ens = useLookupAddress(props.ensProvider, address)
-  const { currentTheme } = useThemeSwitcher()
 
   if(!address) {
     return (
-      <span>
-        <Skeleton avatar paragraph={{ rows: 1 }} />
-      </span>
+      <Flex>
+        <SkeletonCircle size={7} />
+        <SkeletonText w={20} mt={1} ml={1} noOfLines={2} spacing={1} />
+      </Flex>
     )
   }
 
@@ -48,26 +49,21 @@ export default (props) => {
       <Box verticalAlign="middle">
         <Blockies
           seed={address.toLowerCase()}
-          size={8}
+          size={10}
           scale={props.fontSize ? props.fontSize / 7 : 4}
         />
       </Box>
-      <Box
-        verticalAlign="middle"
-        paddingLeft={2}
-      >
-        <Text {...textProps}>
+      <Box ml={2} mr={2}>
+        <Box {...textProps}>
           <a
-            style={{
-              color: currentTheme === "light" ? "#222" : "#DDD"
-            }}
             href={etherscanLink}
             target="_blank"
             rel="noopener noreferrer"
           >
             {displayAddress}
           </a>
-        </Text>
+        </Box>
+        {SecondLine && <SecondLine/>}
       </Box>
     </Flex>
   )

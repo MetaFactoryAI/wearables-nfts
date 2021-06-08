@@ -1,10 +1,10 @@
 import React from "react"
-import { Button, Tooltip } from "antd"
-import { LogoutOutlined } from "@ant-design/icons"
+import { Button, Tooltip, Flex, Box, Image } from '@chakra-ui/react'
+import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 import { useThemeSwitcher } from "react-css-theme-switcher"
-import Address from "./Address"
-import Balance from "./Balance"
-import Wallet from "./Wallet"
+import Address from './Address'
+import Balance from './Balance'
+import Wallet from './Wallet'
 
 /*
   ~ What it does? ~
@@ -54,15 +54,8 @@ export default ({
   if(web3Modal) {
     if(web3Modal.cachedProvider) {
       modalButtons.push(
-        <Tooltip key="logoutbutton" placement="bottom" title="Logout">
+        <Tooltip key="logout" placement="bottom" label="Logout">
           <Button
-            style={{
-              verticalAlign: "top",
-              marginLeft: 8,
-              marginTop: 4,
-            }}
-            shape="round"
-            size="large"
             onClick={logoutOfWeb3Modal}
           >
             <LogoutOutlined />
@@ -71,19 +64,13 @@ export default ({
       )
     } else {
       modalButtons.push(
-        <Button
-          key="loginbutton"
-          style={{
-            verticalAlign: "top",
-            marginLeft: 8,
-            marginTop: 4,
-          }}
-          shape="round"
-          size="large"
-          onClick={loadWeb3Modal}
-        >
-          connect
-        </Button>
+        <Tooltip key="login" placement="bottom" label="Login">
+          <Button
+            onClick={loadWeb3Modal}
+          >
+            <LoginOutlined/>
+          </Button>
+        </Tooltip>
       )
     }
   }
@@ -91,31 +78,26 @@ export default ({
   const { currentTheme } = useThemeSwitcher()
 
   const display = minimized ? null : (
-    <span>
+    <Flex ml={2}>
       {address ? (
         <Address
-          address={address}
+          {...{ address, blockExplorer }}
           ensProvider={mainnetProvider}
-          blockExplorer={blockExplorer}
           size="short"
+          SecondLine={() => (
+            <Balance {...{ address }} provider={localProvider}/>
+          )}
         />
       ) : (
         "Connecting…"
       )}
-      <Balance address={address} provider={localProvider}/>
-      <Wallet
-        address={address}
-        provider={userProvider}
-        ensProvider={mainnetProvider}
-        color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
-      />
-    </span>
+    </Flex>
   )
 
   return (
-    <div>
+    <Flex>
       {display}
       {modalButtons}
-    </div>
+    </Flex>
   )
 }
