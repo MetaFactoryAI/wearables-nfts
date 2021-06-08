@@ -245,7 +245,11 @@ export default (props) => {
             )}
           </Route>
           <Route exact path="/token/:id?">
-            <Token ensProvider={mainnetProvider}/>
+            <Token
+              {...{ address }}
+              ensProvider={mainnetProvider}
+              contract={writeContracts?.WearablesNFTs}
+            />
           </Route>
         </Switch>
       </BrowserRouter>

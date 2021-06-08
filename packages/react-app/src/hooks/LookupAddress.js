@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react"
-import { getAddress, isAddress } from "@ethersproject/address"
-import { useLocalStorage } from "."
-
-// resolved if(name){} to not save "" into cache
+import React, { useState, useEffect } from 'react'
+import { getAddress, isAddress } from '@ethersproject/address'
 
 /*
   ~ What it does? ~
@@ -30,8 +27,6 @@ const lookupAddress = async (provider, address) => {
         await provider.resolveName(reportedName)
       )
 
-      console.info('RR', reportedName, resolvedAddress)
-
       if(
         getAddress(address)
         === getAddress(resolvedAddress)
@@ -43,7 +38,7 @@ const lookupAddress = async (provider, address) => {
       return getAddress(address)
     }
   }
-  return 0
+  return <em>{address}</em>
 }
 
 const useLookupAddress = (provider, address) => {

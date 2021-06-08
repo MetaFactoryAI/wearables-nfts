@@ -58,18 +58,15 @@ export default ({ ensProvider }) => {
                 return tkn
               } else {
                 return {
-                  id: tkn.id,
+                  ...tkn,
+                  loading: false,
                   name: meta.name,
                   description: meta.description,
                   image: httpURL(meta.image),
-                  supply: tkn.supply,
-                  metadata: tkn.metadata,
-                  loading: false,
                 }
               }
             })
           })
-          console.info(meta)
         }
       }))
     }
