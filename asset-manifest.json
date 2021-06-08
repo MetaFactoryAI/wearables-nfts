@@ -1,25 +1,26 @@
 {
   "files": {
     "main.css": "/nft-wearable/static/css/main.0822dd34.chunk.css",
-    "main.js": "/nft-wearable/static/js/main.ea0a6437.chunk.js",
-    "main.js.map": "/nft-wearable/static/js/main.ea0a6437.chunk.js.map",
+    "main.js": "/nft-wearable/static/js/main.145ff411.chunk.js",
+    "main.js.map": "/nft-wearable/static/js/main.145ff411.chunk.js.map",
     "runtime-main.js": "/nft-wearable/static/js/runtime-main.14906420.js",
     "runtime-main.js.map": "/nft-wearable/static/js/runtime-main.14906420.js.map",
     "static/css/2.d89e46c9.chunk.css": "/nft-wearable/static/css/2.d89e46c9.chunk.css",
-    "static/js/2.8217e021.chunk.js": "/nft-wearable/static/js/2.8217e021.chunk.js",
-    "static/js/2.8217e021.chunk.js.map": "/nft-wearable/static/js/2.8217e021.chunk.js.map",
+    "static/js/2.688f41b1.chunk.js": "/nft-wearable/static/js/2.688f41b1.chunk.js",
+    "static/js/2.688f41b1.chunk.js.map": "/nft-wearable/static/js/2.688f41b1.chunk.js.map",
     "index.html": "/nft-wearable/index.html",
-    "precache-manifest.d45686bf4b749a816108c46de57641ee.js": "/nft-wearable/precache-manifest.d45686bf4b749a816108c46de57641ee.js",
+    "precache-manifest.99238ad7ccb849b93237ec3f8faabccc.js": "/nft-wearable/precache-manifest.99238ad7ccb849b93237ec3f8faabccc.js",
     "service-worker.js": "/nft-wearable/service-worker.js",
     "static/css/2.d89e46c9.chunk.css.map": "/nft-wearable/static/css/2.d89e46c9.chunk.css.map",
     "static/css/main.0822dd34.chunk.css.map": "/nft-wearable/static/css/main.0822dd34.chunk.css.map",
-    "static/js/2.8217e021.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.8217e021.chunk.js.LICENSE.txt"
+    "static/js/2.688f41b1.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.688f41b1.chunk.js.LICENSE.txt",
+    "static/media/eth.svg": "/nft-wearable/static/media/eth.ec81052f.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.14906420.js",
     "static/css/2.d89e46c9.chunk.css",
-    "static/js/2.8217e021.chunk.js",
+    "static/js/2.688f41b1.chunk.js",
     "static/css/main.0822dd34.chunk.css",
-    "static/js/main.ea0a6437.chunk.js"
+    "static/js/main.145ff411.chunk.js"
   ]
 }

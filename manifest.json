@@ -1,7 +1,7 @@
 {
-  "short_name": "🏗 Scaffold-Eth App",
+  "short_name": "Wearables NFTs",
   "start_url": ".",
-  "name": "🏗 Scaffold-Eth App",
+  "name": "MetaMerch Wearables NFTs",
   "icons": [
     {
       "src": "favicon.png",
@@ -21,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#000",
+  "background_color": "#FFF"
 }
