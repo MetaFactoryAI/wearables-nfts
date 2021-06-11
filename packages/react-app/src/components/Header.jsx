@@ -1,14 +1,16 @@
 import React from "react"
-import { PageHeader } from "antd"
+import { chakra, Flex, Image, Text } from '@chakra-ui/react'
+import { Link } from 'react-router-dom'
+import "@fontsource/crimson-text/600.css"
+import logo from '../logo.svg'
 
-export default function Header() {
-  return (
-    <a href="https://github.com/dysbulic/nft-wearable" target="_blank" rel="noopener noreferrer">
-      <PageHeader
-        title="Wearable NFTs"
-        subTitle="Ceramic-updatable ERC-1155 creating a virtual analogue of MetaMerch"
-        style={{ cursor: "pointer" }}
-      />
-    </a>
-  );
-}
+export default (props) => (
+  <Link to="/">
+    <chakra.header fontFamily="Crimson Text" fontSize={35} {...props}>
+      <Flex align="center">
+        <Image src={logo} h="2rem"/>
+        <Text ml={3}>MetaFactory Wearables NFT Manager</Text>
+      </Flex>
+    </chakra.header>
+  </Link>
+)

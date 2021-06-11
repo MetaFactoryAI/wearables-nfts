@@ -2447,6 +2447,11 @@
     "@ethersproject/properties" "^5.1.0"
     "@ethersproject/strings" "^5.1.0"
 
+"@fontsource/crimson-text@^4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@fontsource/crimson-text/-/crimson-text-4.4.5.tgz#43912dea7f73c54d766826129c2fc69cdcf0d801"
+  integrity sha512-V/mICIP3nKLNOtzhW+gGu0hBPLmuHzfSO5wCFzk3OPOwlc7Krb670uL8XsfWkqnOT4+Z6DoFOzdrdICni+BIMg==
+
 "@graphiql/toolkit@^0.2.0":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@graphiql/toolkit/-/toolkit-0.2.1.tgz#2e23829ab7327d79006126dfe72cfed72c61250c"

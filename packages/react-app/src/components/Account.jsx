@@ -75,8 +75,6 @@ export default ({
     }
   }
 
-  const { currentTheme } = useThemeSwitcher()
-
   const display = minimized ? null : (
     <Flex ml={2}>
       {address ? (

@@ -49,7 +49,7 @@ export default (props) => {
       <Box verticalAlign="middle">
         <Blockies
           seed={address.toLowerCase()}
-          size={10}
+          size={15}
           scale={props.fontSize ? props.fontSize / 7 : 4}
         />
       </Box>

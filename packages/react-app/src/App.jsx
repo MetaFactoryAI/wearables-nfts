@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom"
-import "antd/dist/antd.css"
 import {
   StaticJsonRpcProvider, JsonRpcProvider, Web3Provider,
 } from "@ethersproject/providers"
-import "./App.css"
-import { Row, Col, Button, Menu, Switch as SwitchD } from "antd"
 import {
   Box, Alert, AlertIcon, AlertTitle, AlertDescription,
   CloseButton, Tabs, TabList, TabPanels, Tab, TabPanel,
@@ -23,10 +20,11 @@ import {
 import { Transactor } from "./helpers"
 import { formatEther, parseEther } from "@ethersproject/units"
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants"
-import NFTCreator from "./views/NFTCreator"
-import NewNFT from "./views/NewNFT"
-import EditNFT from "./views/EditNFT"
-import Token from "./views/Token"
+import ExistingNFTs from "./views/ExistingNFTs"
+import CreateNFT from "./views/CreateNFT"
+import NFTProperties from "./views/NFTProperties"
+import DisburseNFTs from "./views/DisburseNFTs"
+import ChainAlert from "./components/ChainAlert"
 
 /// 📡 What chain are your contracts deployed to?
 // const targetNetwork = NETWORKS['localhost'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
@@ -37,11 +35,6 @@ const DEBUG = true
 
 // 🛰 providers
 if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum")
-// const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
-// const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
-const scaffoldEthProvider = (
-  new StaticJsonRpcProvider("https://rpc.scaffoldeth.io:48544")
-)
 const mainnetInfura = (
   new StaticJsonRpcProvider(`https://mainnet.infura.io/v3/${INFURA_ID}`)
 )
@@ -57,13 +50,7 @@ const localProvider = new StaticJsonRpcProvider(localProviderUrl)
 const blockExplorer = targetNetwork.blockExplorer
 
 export default (props) => {
-  const mainnetProvider = (
-    (scaffoldEthProvider && scaffoldEthProvider._network) ? (
-      scaffoldEthProvider
-    ) : (
-      mainnetInfura
-    )
-  )
+  const mainnetProvider = mainnetInfura
   const [injectedProvider, setInjectedProvider] = useState()
   const gasPrice = useGasPrice(targetNetwork, 'fast') // EtherGasStation
   const userProvider = useUserProvider(injectedProvider, localProvider)
@@ -83,20 +70,14 @@ export default (props) => {
       {targetNetwork.name}
     </Box>
   )
+  console.info('CHAINS', userProvider?._network, localChainId, selectedChainId)
   if(localChainId && selectedChainId && localChainId != selectedChainId) {
     NetworkDisplay = () => (
       <Box
         zIndex={2} position="absolute"
-        right={0} top={5}
+        right={2} top={5}
       >
-        <Alert status="error" maxW="6em">
-          <AlertIcon />
-          <AlertTitle mr={2}>⚠️ Wrong Network:</AlertTitle>
-          <AlertDescription>
-            You have <b>{NETWORK(selectedChainId)?.name ?? "Unknown"}</b> selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
-          </AlertDescription>
-          <CloseButton position="absolute" right="8px" top="8px" />
-        </Alert>
+        <ChainAlert {...{ NETWORK, selectedChainId, localChainId }}/>
       </Box>
     )
   }
@@ -118,92 +99,14 @@ export default (props) => {
   }, [setRoute])
 
   return (
-    <div className="App">
-      <Header />
-      <NetworkDisplay/>
-      <BrowserRouter>
-        <Menu
-          style={{ textAlign: "center" }}
-          selectedKeys={[route]}
-          mode="horizontal"
-        >
-          <Menu.Item key="/">
-            <Link onClick={() => setRoute("/")} to="/">
-              📺 Consumers
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/create">
-            <Link onClick={() => setRoute("/create")} to="/create">
-              🎨 Creators
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/new">
-            <Link onClick={() => setRoute("/new")} to="/new">
-              ➕ New
-            </Link>
-          </Menu.Item>
-        </Menu>
-
-        <Switch>
-          <Route exact path="/">
-            {writeContracts ? (
-              <NFTCreator
-                ensProvider={mainnetProvider}
-                contract={writeContracts?.WearablesNFTs}
-              />
-            ) : (
-              <p>Unable to retrieve contracts. ¿Have they been created?</p>
-            )}
-          </Route>
-          <Route exact path="/create">
-            <Contract
-              name="WearablesNFTs"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-          </Route>
-          <Route exact path="/new">
-            {writeContracts ? (
-              <NewNFT
-                contract={writeContracts?.WearablesNFTs}
-                treasurer={address}
-              />
-            ) : (
-              <p>Unable to retrieve contracts. ¿Have they been created?</p>
-            )}
-          </Route>
-          <Route exact path="/edit/:id?">
-            {readContracts ? (
-              <EditNFT
-                {...{ tx }}
-                contract={readContracts?.WearablesNFTs}
-              />
-            ) : (
-              <p>Unable to retrieve contracts. ¿Have they been created?</p>
-            )}
-          </Route>
-          <Route exact path="/token/:id">
-            <Token
-              {...{ address }}
-              ensProvider={mainnetProvider}
-              contract={writeContracts?.WearablesNFTs}
-            />
-          </Route>
-        </Switch>
-      </BrowserRouter>
-
-      <ThemeSwitch />
-
+    <Box className="App">
       <Box
-        position="fixed"
-        textAlign="right"
-        right={0} top={0}
-        padding={10}
+        position="fixed" textAlign="right"
+        right={2} top={2}
       >
         <Account
-          {...{ address,
+          {...{
+            address,
             localProvider,
             userProvider,
             mainnetProvider,
@@ -214,18 +117,42 @@ export default (props) => {
           }}
         />
       </Box>
+      <NetworkDisplay/>
+
+      <BrowserRouter>
+        <Header minH="4em" pl={10} pt={5}/>
+
+        <Switch>
+          <Route path='/'>
+            <ExistingNFTs
+              ensProvider={mainnetProvider}
+            />
+          </Route>
+          <Route path='/new'>
+            <CreateNFT
+              contract={writeContracts?.WearablesNFTs}
+              treasurer={address}
+            />
+          </Route>
+          <Route path='/edit/:id?' component={NFTProperties}/>
+          {/* <Route path='/view/:id?' component={NFTDetails}/> */}
+          <Route path='/disburse/:id?'>
+            <DisburseNFTs
+              {...{ address }}
+              ensProvider={mainnetProvider}
+              contract={writeContracts?.WearablesNFTs}
+            />
+          </Route>
+        </Switch>
+      </BrowserRouter>
 
       <Box
         position="fixed" textAlign="left"
         left={0} bottom={0} padding={10}
       >
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-        </Row>
+        <GasGauge gasPrice={gasPrice} />
       </Box>
-    </div>
+    </Box>
   )
 }
 

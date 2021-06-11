@@ -7,8 +7,7 @@ import {
 import { useQuery, gql } from '@apollo/client'
 import { useParams } from 'react-router'
 import Address from '../components/Address'
-import Distribute from './Distribute'
-import sprinkler from '../sprinkler.svg'
+import Distribute from './DistributeModal'
 
 const TOKEN = gql(`
   query GetToken($id: String!) {
@@ -71,10 +70,6 @@ export default ({ ensProvider, address, contract }) => {
     error = error ?? "Couldn't find any balances."
   }
 
-  if(!balances || balances.length === 0) {
-    error = error ?? "Couldn't find any balances."
-  }
-
   if(error) {
     return (
       <Alert status="error">
@@ -85,7 +80,7 @@ export default ({ ensProvider, address, contract }) => {
   }
 
   return (
-    <Stack>
+    <Box>
       <Distribute {...{ isOpen, onClose, quantity, distribute }}/>
       <Table>
         <Thead>
@@ -108,7 +103,6 @@ export default ({ ensProvider, address, contract }) => {
           ))}
         </Tbody>
       </Table>
-      <Button onClick={config}>Distribute Tokens</Button>
-    </Stack>
+    </Box>
   )
 }
