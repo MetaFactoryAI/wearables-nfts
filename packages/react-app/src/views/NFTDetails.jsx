@@ -55,7 +55,7 @@ export default ({ contract, validNetwork }) => {
         }
       })()
     }
-  }, [data.token])
+  }, [data])
 
   if(id === undefined) {
     return (

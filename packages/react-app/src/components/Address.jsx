@@ -48,13 +48,11 @@ export default (props) => {
 
   return (
     <Flex title={address}>
-      <Box verticalAlign="middle">
-        <Blockies
-          seed={address.toLowerCase()}
-          size={SecondLine ? 15 : 8}
-          scale={props.fontSize ? props.fontSize / 7 : 4}
-        />
-      </Box>
+      <Blockies
+        seed={address.toLowerCase()}
+        size={SecondLine ? 15 : 8}
+        scale={props.fontSize ? props.fontSize / 7 : 4}
+      />
       <Box ml={2} mr={2}>
         <Box {...textProps}>
           <a

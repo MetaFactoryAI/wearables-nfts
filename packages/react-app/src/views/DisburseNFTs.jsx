@@ -7,7 +7,7 @@ import {
 import { useQuery, gql } from '@apollo/client'
 import { useParams } from 'react-router'
 import Address from '../components/Address'
-import Distribute from './DistributeModal'
+import Distribute from '../components/DistributeModal'
 import { httpURL } from '../helpers'
 
 const TOKEN = gql(`

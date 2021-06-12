@@ -67,6 +67,8 @@ export default ({ action = null }) => {
 
   useEffect(() => { load() }, [load])
   
+  console.info('List')
+
   if(error) {
     return (
       <Alert status="error">
@@ -141,27 +143,28 @@ export default ({ action = null }) => {
               <Td><a href={token.metadata}><ExternalLinkIcon/></a></Td>
               {!action && (
                 <Td>
-                  <Link to={`/disburse/${token.id}`} title="Distribute">
-                    <Button borderWidth={3} variant="outline">
-                      <span role="img" aria-label="Distribute">
-                        ⛲
-                      </span>
-                    </Button>
-                  </Link>
-                  <Link to={`/view/${token.id}`} title="View">
-                    <Button>
-                      <span role="img" aria-label="View">
-                        👁️
-                      </span>
-                    </Button>
-                  </Link>
-                  <Link to={`/edit/${token.id}`} title="Edit">
-                    <Button>
-                      <span role="img" aria-label="Edit">
-                        ✏️
-                      </span>
-                    </Button>
-                  </Link>
+                  {
+                    Object.entries({
+                      disburse: { title: 'Distribute', icon: '⛲' },
+                      view: { title: 'View', icon: '👁️' },
+                      edit: { title: 'Edit', icon: '✏️' },
+                    })
+                    .map(([action, { title, icon }]) => (
+                      <Link
+                        to={`/${action}/${token.id}`}
+                        key={action} {...{ title }}
+                      >
+                        <Button
+                          borderWidth={3} variant="outline"
+                          _hover={{ bg: '#00FF0044' }}
+                        >
+                          <span role="img" aria-label={title}>
+                            {icon}
+                          </span>
+                        </Button>
+                      </Link>
+                    ))
+                  }
                 </Td>
               )}
             </Tr>

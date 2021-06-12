@@ -20,17 +20,12 @@ export default ({
 
   if(usingBalance) {
     const etherBalance = formatEther(usingBalance)
-    parseFloat(etherBalance).toFixed(2)
     floatBalance = parseFloat(etherBalance)
   }
 
-  let displayBalance = (
-    floatBalance.toFixed(4)
-  )
-
   return (
     <Flex title={`${floatBalance} ETH`} {...props}>
-      {displayBalance}
+      {floatBalance.toFixed(4)}
       <Image src={eth} alt="ETH" h="0.9em" mt="4px" ml="2px"/>
     </Flex>
   )

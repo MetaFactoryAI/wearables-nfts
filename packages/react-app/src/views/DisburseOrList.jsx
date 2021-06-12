@@ -18,8 +18,13 @@ export default ({
   } else {
     return (
       <>
-        <Heading align="center" m={8}>Select Which NFT To Distribute</Heading>
-        <ExistingNFTs {...{ ensProvider, validNetwork }} action="disburse"/>
+        <Heading align="center" m={8}>
+          Select Which NFT To Distribute
+        </Heading>
+        <ExistingNFTs
+          {...{ ensProvider, validNetwork }}
+          action="disburse"
+        />
       </>
     )
   }

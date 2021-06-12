@@ -1,14 +1,14 @@
-import React from "react"
+import React, { useEffect, useState } from 'react'
 import {
   Box, Button, chakra, Flex, Image, Spacer, Stack, Text, Tooltip,
   ButtonGroup,
 } from '@chakra-ui/react'
-import { LoginOutlined, LogoutOutlined } from "@ant-design/icons"
+import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Link, useLocation } from 'react-router-dom'
-import ChainAlert from "./ChainAlert"
-import Account from "./Account"
+import ChainAlert from './ChainAlert'
+import Account from './Account'
 import logo from '../logo.svg'
-import "@fontsource/crimson-text/600.css"
+import '@fontsource/crimson-text/600.css'
 
 export default ({
   NETWORK, address, blockExplorer, targetNetwork,
@@ -41,16 +41,31 @@ export default ({
       title: 'Edit NFT Metadata', icon: '✏️',
     },
   }
-  const path = location.pathname.replace(/^(\/[^/]*)(\/.+)?$/, (str, group) => group) 
+  const path = (
+    location.pathname
+    .replace(/^(\/[^/]*)(\/.+)?$/, (str, group) => group)
+  ) 
   const title = paths[path]
   const localChainId = localProvider?._network?.chainId
-  const selectedChainId = injectedProvider?._network?.chainId
+  const [selectedChainId, setSelectedChainId] = useState(null)
   const NetworkDisplay = () => (
     <Box mt="0 ! important" w="100%" textAlign="center">
-      {!injectedProvider ? 'Disconnected' : NETWORK(selectedChainId)?.name ?? "Unknown"}
+      {!injectedProvider ? 'Disconnected' : (
+        NETWORK(selectedChainId)?.name ?? `Unknown (${selectedChainId})`
+      )}
     </Box>
   )
 
+  useEffect(() => {
+    if(injectedProvider) {
+      (async () => {
+        setSelectedChainId(
+          (await injectedProvider.getNetwork()).chainId
+        )
+      })()
+    }
+  }, [injectedProvider])
+  
   let NetworkMismatch = null
   if(localChainId && selectedChainId && localChainId !== selectedChainId) {
     NetworkMismatch = () => (

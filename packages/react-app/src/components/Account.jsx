@@ -1,35 +1,32 @@
-import React from "react"
+import React, { useMemo } from 'react'
 import { Flex } from '@chakra-ui/react'
 import Address from './Address'
 import Balance from './Balance'
 
 export default ({
   address,
-  localProvider,
+  injectedProvider,
   mainnetProvider,
   minimized,
   blockExplorer,
-}) => {
-  const display = minimized ? null : (
-    <Flex ml={2}>
-      {address ? (
+}) => (
+  minimized ? null : (
+    <Flex ml={2} mt="-1.5rem">
+      {!address ? (
+        "Connecting…"
+      ) : (
         <Address
           {...{ address, blockExplorer }}
           ensProvider={mainnetProvider}
           size="short"
           SecondLine={
-            <Balance mt="-5px" {...{ address }} provider={localProvider}/>
+            <Balance
+              mt="-5px" {...{ address }}
+              provider={injectedProvider}
+            />
           }
         />
-      ) : (
-        "Connecting…"
       )}
     </Flex>
   )
-
-  return (
-    <Flex>
-      {display}
-    </Flex>
-  )
-}
+)
