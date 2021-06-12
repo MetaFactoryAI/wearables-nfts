@@ -1,7 +1,7 @@
 import {
   chakra, Button, Spinner, FormControl, Container, Input,
   FormLabel, UnorderedList, ListItem, Box, Image,
-  Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex, Alert, AlertIcon,
+  Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex, Alert, AlertIcon, IconButton,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
@@ -9,6 +9,7 @@ import { useParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { useLocation } from 'react-router-dom'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { SaveOutlined } from '@ant-design/icons'
 import { httpURL } from '../helpers'
 import EditOrList from './EditOrList'
 
@@ -62,7 +63,7 @@ export default ({ contract, validNetwork }) => {
         }
       })()
     }
-  }, [data.token])
+  }, [data])
 
   if(id === undefined) {
     return (
@@ -110,7 +111,9 @@ export default ({ contract, validNetwork }) => {
         </FormControl>
         <Button
           type="submit" isDisabled={!validNetwork} mt={5}
-          title={validNetwork ? 'Replace Metadata' : 'Connect to the correct network.'}
+          title={validNetwork ? 'Replace Metadata' : (
+            'Connect to the correct network.'
+          )}
         >
           Overwrite Metadata
         </Button>
@@ -119,72 +122,75 @@ export default ({ contract, validNetwork }) => {
   }
 
   return (
-    <Container sx={{ a: { textDecoration: 'underline' } }}>
-      <UnorderedList listStyleType="disclosure-closed">
-        <ListItem>
-          <FormControl>
-            <Flex align="center">
-              <FormLabel>Name:</FormLabel>
-              <Input
-                value={name}
-                onChange={evt => setName(evt.target.value)}
-              />
-            </Flex>
-          </FormControl>
-        </ListItem>
-        <ListItem>Description:
-          <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
-            <TabList mb="1em">
-              <Tab>Markdown</Tab>
-              <Tab>Preview</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <Textarea
-                  placeholder="Enter a markdown formatted description."
-                  value={description} minH="8em"
-                  onChange={evt => setDescription(evt.target.value)}
+    <Flex direction="row-reverse" align="center">
+      <IconButton aria-label="Save" title="Save" icon={<SaveOutlined/>}/>
+      <Container sx={{ a: { textDecoration: 'underline' } }}>
+        <UnorderedList listStyleType="disclosure-closed">
+          <ListItem>
+            <FormControl>
+              <Flex align="center">
+                <FormLabel>Name:</FormLabel>
+                <Input
+                  value={name}
+                  onChange={evt => setName(evt.target.value)}
                 />
-              </TabPanel>
-              <TabPanel>
-                <ReactMarkdown>
-                  {description}
-                </ReactMarkdown>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </ListItem>
-        <ListItem>
-          <FormControl>
-            <Flex align="center">
-              <FormLabel>Homepage:</FormLabel>
-              <Input
-                value={homepage}
-                onChange={evt => setHomepage(evt.target.value)}
-              />
-              {homepage.length > 0 && (
-                <chakra.a ml={3} href={homepage} target="_blank">
-                  <ExternalLinkIcon/>
-                </chakra.a>
-              )}
-            </Flex>
-          </FormControl>
-        </ListItem>
-        <ListItem>Image:
-          <Image src={httpURL(metadata.image)} maxH="15em"/>
-        </ListItem>
-        <ListItem>Models:{' '}
-          {Object.keys(wearables).length === 0 ? (
-            <em>None</em>
-          ) : (
-            <UnorderedList>
-              {Object.entries(wearables).map(([mimetype, model]) => (
-                <ListItem><a href={httpURL(model)}>{mimetype}</a></ListItem>
-              ))}
-            </UnorderedList>
-          )}
-        </ListItem>
-      </UnorderedList>
-    </Container>
+              </Flex>
+            </FormControl>
+          </ListItem>
+          <ListItem>Description:
+            <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
+              <TabList mb="1em">
+                <Tab>Markdown</Tab>
+                <Tab>Preview</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <Textarea
+                    placeholder="Enter a markdown formatted description."
+                    value={description} minH="8em"
+                    onChange={evt => setDescription(evt.target.value)}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <ReactMarkdown>
+                    {description}
+                  </ReactMarkdown>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </ListItem>
+          <ListItem>
+            <FormControl>
+              <Flex align="center">
+                <FormLabel>Homepage:</FormLabel>
+                <Input
+                  value={homepage}
+                  onChange={evt => setHomepage(evt.target.value)}
+                />
+                {homepage.length > 0 && (
+                  <chakra.a ml={3} href={homepage} target="_blank">
+                    <ExternalLinkIcon/>
+                  </chakra.a>
+                )}
+              </Flex>
+            </FormControl>
+          </ListItem>
+          <ListItem>Image:
+            <Image src={httpURL(metadata.image)} maxH="15em"/>
+          </ListItem>
+          <ListItem>Models:{' '}
+            {Object.keys(wearables).length === 0 ? (
+              <em>None</em>
+            ) : (
+              <UnorderedList>
+                {Object.entries(wearables).map(([mimetype, model]) => (
+                  <ListItem><a href={httpURL(model)}>{mimetype}</a></ListItem>
+                ))}
+              </UnorderedList>
+            )}
+          </ListItem>
+        </UnorderedList>
+      </Container>
+    </Flex>
   )
 }

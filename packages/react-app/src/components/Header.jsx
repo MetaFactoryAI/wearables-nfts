@@ -105,9 +105,9 @@ export default ({
   return (
     <chakra.header
       {...props} bg="white" // brittle
-      top={0} position="sticky" zIndex={2}
+      top={0} position={['inherit', 'sticky']} zIndex={2}
     >
-      <Flex align="center">
+      <Flex align="center" direction={['column', 'row']}>
         <Link to="/">
           <Flex>
             <Image src={logo} h="2rem"/>
@@ -131,21 +131,23 @@ export default ({
           ))}
         </ButtonGroup>
         <Spacer grow={1}/>
-        {address && (
-          <Account
-            {...{
-              address,
-              localProvider,
-              injectedProvider,
-              mainnetProvider,
-              blockExplorer,
-            }}
-          />
-        )}
-        <Stack mr={5}>
-          <ConnectionButton/>
-          <NetworkDisplay/>
-        </Stack>
+        <Flex mt={[5, '-1rem']}>
+          {address && (
+            <Account
+              {...{
+                address,
+                localProvider,
+                injectedProvider,
+                mainnetProvider,
+                blockExplorer,
+              }}
+            />
+          )}
+          <Stack mr={5}>
+            <ConnectionButton/>
+            <NetworkDisplay/>
+          </Stack>
+        </Flex>
         {NetworkMismatch && <NetworkMismatch/>}
       </Flex>
     </chakra.header>

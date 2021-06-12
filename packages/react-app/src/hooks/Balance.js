@@ -21,7 +21,7 @@ export default (provider, address, pollTime = 0) => {
 
   useEffect(
     () => { pollBalance(provider, address) },
-    [pollBalance],
+    [pollBalance, provider, address],
   )
 
   useOnBlock(

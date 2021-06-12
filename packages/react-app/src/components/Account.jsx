@@ -1,17 +1,15 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Flex } from '@chakra-ui/react'
 import Address from './Address'
 import Balance from './Balance'
 
 export default ({
-  address,
-  injectedProvider,
-  mainnetProvider,
-  minimized,
-  blockExplorer,
+  address, minimized,
+  injectedProvider, mainnetProvider, blockExplorer,
+  ...props
 }) => (
   minimized ? null : (
-    <Flex ml={2} mt="-1.5rem">
+    <Flex {...props}>
       {!address ? (
         "Connecting…"
       ) : (

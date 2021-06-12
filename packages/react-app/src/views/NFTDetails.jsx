@@ -23,7 +23,7 @@ const TOKEN = gql(`
 export default ({ contract, validNetwork }) => {
   const [metadata, setMetadata] = useState()
   const [tokenId, setTokenId] = useState()
-  const homepage = metadata?.properties?.external_url
+  const homepage = metadata?.external_url
   const wearables = metadata?.properties?.wearables ?? {}
   const history = useHistory()
   const params = useParams()
@@ -86,7 +86,7 @@ export default ({ contract, validNetwork }) => {
 
   return (
     <Container sx={{ a: { textDecoration: 'underline' } }}>
-      <Heading size="md" my={5}>Name: {metadata.name}</Heading>
+      <Heading size="md" my={5} align="center">{metadata.name}</Heading>
       <UnorderedList>
         <ListItem>Token ID: {tokenId}</ListItem>
         <ListItem>Description:
@@ -97,7 +97,9 @@ export default ({ contract, validNetwork }) => {
           </Box>
         </ListItem>
         <ListItem>Homepage:{' '}
-          {homepage ? <a href={homepage}>{homepage}</a> : <em>None</em>}
+          {homepage ? (
+            <a href={homepage}>{homepage}</a>
+          ) : <em>None</em>}
         </ListItem>
         <ListItem>Image:
           <Image src={httpURL(metadata.image)} maxH="15em"/>

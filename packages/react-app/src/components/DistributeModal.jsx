@@ -6,7 +6,7 @@ import {
   FormControl, FormLabel, FormHelperText, Textarea,
   OrderedList, ListItem,
 } from '@chakra-ui/react'
-import Address from '../components/Address'
+import Address from './Address'
 
 export default ({
   isOpen = false, onClose, quantity, ensProvider,
