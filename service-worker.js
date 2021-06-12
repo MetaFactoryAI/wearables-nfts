@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/nft-wearable/precache-manifest.9df697b67fe16c4201ba871b194b8adb.js"
+  "/nft-wearable/precache-manifest.4068dc777de4afe9005223f013d94d58.js"
 );
 
 self.addEventListener('message', (event) => {
