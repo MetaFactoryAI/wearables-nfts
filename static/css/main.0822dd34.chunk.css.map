@@ -1,1 +1,0 @@
-{"version":3,"sources":["index.css","App.css"],"names":[],"mappings":"AAAA,KACE,QACF,CAEA,KACE,yEACF,CCNA,KACE,iBACF","file":"main.0822dd34.chunk.css","sourcesContent":["body {\n  margin: 0;\n}\n\ncode {\n  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;\n}\n",".App {\n  text-align: center;\n}\n"]}
