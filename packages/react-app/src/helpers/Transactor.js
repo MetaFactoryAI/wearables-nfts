@@ -24,40 +24,40 @@ export default function Transactor(provider, gasPrice, etherscan) {
         transactionHandler: txInformation => {
           console.log("HANDLE TX", txInformation)
         },
-      };
-      const notify = Notify(options);
+      }
+      const notify = Notify(options)
 
-      let etherscanNetwork = "";
-      if (network.name && network.chainId > 1) {
-        etherscanNetwork = network.name + ".";
+      let etherscanNetwork = ""
+      if(network.name && network.chainId > 1) {
+        etherscanNetwork = `${network.name}.`
       }
 
-      let etherscanTxUrl = "https://" + etherscanNetwork + "etherscan.io/tx/";
-      if (network.chainId === 100) {
-        etherscanTxUrl = "https://blockscout.com/poa/xdai/tx/";
+      let etherscanTxUrl = `https://${etherscanNetwork}etherscan.io/tx/`
+      if(network.chainId === 100) {
+        etherscanTxUrl = "https://blockscout.com/poa/xdai/tx/"
       }
 
       try {
-        let result;
+        let result
         if(tx instanceof Promise) {
           console.log("AWAITING TX", tx)
           result = await tx
         } else {
           if(!tx.gasPrice) {
-            tx.gasPrice = gasPrice || parseUnits("4.1", "gwei");
+            tx.gasPrice = gasPrice || parseUnits("4.1", "gwei")
           }
           if(!tx.gasLimit) {
-            tx.gasLimit = hexlify(120000);
+            tx.gasLimit = hexlify(120000)
           }
-          console.log("RUNNING TX", tx);
-          result = await signer.sendTransaction(tx);
+          console.log("RUNNING TX", tx)
+          result = await signer.sendTransaction(tx)
         }
-        console.log("RESULT:", result);
-        // console.log("Notify", notify);
+        console.log("RESULT:", result)
+        // console.log("Notify", notify)
 
         // if it is a valid Notify.js network, use that, if not, just send a default notification
-        if ([1, 3, 4, 5, 42, 100].includes(network.chainId)) {
-          const { emitter } = notify.hash(result.hash);
+        if([1, 3, 4, 5, 42, 100].includes(network.chainId)) {
+          const { emitter } = notify.hash(result.hash)
           emitter.on("all", transaction => ({
             onclick: () => window.open((etherscan || etherscanTxUrl) + transaction.hash),
           }))
@@ -69,10 +69,10 @@ export default function Transactor(provider, gasPrice, etherscan) {
           })
         }
 
-        return result;
+        return result
       } catch (e) {
-        console.error(e);
-        console.log("Transaction Error:", e.message);
+        console.error(e)
+        console.log("Transaction Error:", e.message)
         notification.error({
           message: "Transaction Error",
           description: e.message,

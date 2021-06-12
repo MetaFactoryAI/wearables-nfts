@@ -37,8 +37,8 @@ contract WearablesNFTs is ERC1155 {
 
   function distributeSingles(
     address from,
-    address[] to,
-    uint256 memory id,
+    address[] memory to,
+    uint256 id,
     bytes memory data
   ) public virtual {
     require(

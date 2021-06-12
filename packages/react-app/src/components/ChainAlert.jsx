@@ -3,13 +3,13 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
-export default ({ NETWORK, selectedChainId, localChainId }) => {
+export default ({ NETWORK, selectedChainId, localChainId, ...props }) => {
   const [show, setShow] = useState(true)
 
   if(!show) return null
 
   return (
-    <Alert status="error" maxW="20em" flexDirection="column">
+    <Alert status="error" maxW="20em" flexDirection="column" {...props}>
       <AlertIcon />
       <AlertTitle mr={2}>⚠️ Wrong Network</AlertTitle>
       <AlertDescription align="center">

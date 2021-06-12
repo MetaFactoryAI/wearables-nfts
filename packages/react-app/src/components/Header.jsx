@@ -1,8 +1,9 @@
 import React from "react"
 import {
   Box, Button, chakra, Flex, Image, Spacer, Stack, Text, Tooltip,
+  ButtonGroup,
 } from '@chakra-ui/react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useRouteMatch } from 'react-router-dom'
 import "@fontsource/crimson-text/600.css"
 import logo from '../logo.svg'
 import ChainAlert from "./ChainAlert"
@@ -15,20 +16,42 @@ export default ({
   web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
   ...props
 }) => {
-  let localChainId = localProvider?._network?.chainId
-  let selectedChainId = injectedProvider?._network?.chainId
-
-  let NetworkDisplay = () => (
-    <Box mt="0 ! important">
-      {targetNetwork.name}
+  const location = useLocation()
+  const paths = {
+    '/': 'List',
+    '/new': 'Create',
+    '/disburse': 'Distribute',
+    '/edit': 'Edit',
+    '/view': 'Display',
+  }
+  const links = {
+    '/': {
+      title: 'List Existing NFTs', icon: '🗃',
+    },
+    '/new': {
+      title: 'Create a New NFT', icon: '➕',
+    },
+    '/disburse': {
+      title: 'Distribute Existing NFTs', icon: '⛲',
+    },
+  }
+  const path = location.pathname.replace(/^(\/[^/]*)(\/.+)?$/, (str, group) => group) 
+  const title = paths[path]
+  const localChainId = localProvider?._network?.chainId
+  const selectedChainId = injectedProvider?._network?.chainId
+  const NetworkDisplay = () => (
+    <Box mt="0 ! important" w="100%" textAlign="center">
+      {!injectedProvider ? 'Disconnected' : NETWORK(selectedChainId)?.name ?? "Unknown"}
     </Box>
   )
-  console.info('CHAINS', injectedProvider?._network, localChainId, selectedChainId)
-  if(localChainId && selectedChainId && localChainId != selectedChainId) {
-    NetworkDisplay = () => (
-      <Box>
-        <ChainAlert {...{ NETWORK, selectedChainId, localChainId }}/>
-      </Box>
+
+  let NetworkMismatch = null
+  if(localChainId && selectedChainId && localChainId !== selectedChainId) {
+    NetworkMismatch = () => (
+      <ChainAlert
+        {...{ NETWORK, selectedChainId, localChainId }}
+        position="absolute" top={3} right={3} zIndex={2}
+      />
     )
   }
 
@@ -61,17 +84,31 @@ export default ({
   return (
     <chakra.header
       {...props} bg="white" // brittle
-      top={0} position="sticky" zIndex={10}
+      top={0} position="sticky" zIndex={2}
     >
       <Flex align="center">
         <Link to="/">
           <Flex>
             <Image src={logo} h="2rem"/>
             <Text ml={3} fontFamily="Crimson Text" fontSize={35}>
-              MetaFactory Wearables NFT Manager
+              MetaFactory Wearables NFT Manager{title ? `: ${title}` : ''}
             </Text>
           </Flex>
         </Link>
+        <Spacer grow={1}/>
+        <ButtonGroup isAttached variant="outline">
+          {Object.entries(links).map(([link, { title, icon }]) => (
+            <Link to={link} key={link}>
+              <Button
+                title={title}
+                borderWidth={3}
+                colorScheme={link === path ? 'blue' : 'gray'}
+              >
+                {icon}
+              </Button>
+            </Link>
+          ))}
+        </ButtonGroup>
         <Spacer grow={1}/>
         {address && (
           <Account
@@ -88,6 +125,7 @@ export default ({
           <ConnectionButton/>
           <NetworkDisplay/>
         </Stack>
+        {NetworkMismatch && <NetworkMismatch/>}
       </Flex>
     </chakra.header>
   )

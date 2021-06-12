@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import {
   Alert, AlertIcon, Button, Spinner, Image,
-  Table, Thead, Tbody, Tr, Th, Td,
+  Table, Thead, Tbody, Tr, Th, Td, Container,
 } from '@chakra-ui/react'
 import { ExternalLinkIcon, ViewIcon } from '@chakra-ui/icons'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
 import registryAddress from '../contracts/WearablesNFTs.address'
+import { httpURL } from '../helpers'
 
 const TOKENS = gql(`
   query GetTokens {
@@ -21,18 +22,10 @@ const TOKENS = gql(`
   }
 `)
 
-const httpURL = (uri) => {
-  const match = uri.match(/^(ip[nf]s):\/\/(.+)$/)
-  if(!match) {
-    return uri
-  } else {
-    return `https://ipfs.io/${match[1]}/${match[2]}`
-  }
-}
-
-export default ({ ensProvider }) => {
+export default ({ ensProvider, action = null }) => {
   const { loading, error, data } = useQuery(TOKENS)
   const [tokens, setTokens] = useState(null) 
+  const history = useHistory()
   const load = async () => {
     if(data) {
       const tokenData = data?.tokenRegistry?.tokens
@@ -89,11 +82,11 @@ export default ({ ensProvider }) => {
 
   if(tokens.length === 0) {
     return (
-      <>
+      <Container align="center">
         <h2>No Tokens Have Been Created Yet</h2>
         <h2><em>(If you just minted a token, it may take several seconds for The Graph to add the new token to its index.)</em></h2>
         <Link to="/new"><Button>Create One</Button></Link>
-      </>
+      </Container>
     )
   }
 
@@ -104,35 +97,58 @@ export default ({ ensProvider }) => {
       }}
     >
       <Thead>
-        <Tr>
+        <Tr position="sticky" top="5rem" bg="white" zIndex={2}>
           <Th>Name</Th>
           <Th>Image</Th>
           <Th>Description</Th>
           <Th>Supply</Th>
           <Th>Metadata</Th>
-          <Th>Distribution</Th>
+          {!action && <Th>Actions</Th>}
         </Tr>
       </Thead>
       <Tbody>
-        {tokens.map((token, idx) => (
-          <Tr key={idx}>
-            <Td>{token.loading ? <Spinner/> : (
-              token.name ?? <em>Unnamed</em>
-            )}</Td>
-            <Td>{token.loading ? <Spinner/> : (
-              <a href={token.image}>
-                <Image maxH="5rem" m="auto" src={token.image}/>
-              </a>
-              ?? <em>No Image</em>
-            )}</Td>
-            <Td>{token.loading ? <Spinner/> : (
-              token.description ?? <em>No Description</em>
-            )}</Td>
-            <Td>{token.supply}</Td>
-            <Td><a href={token.metadata}><ExternalLinkIcon/></a></Td>
-            <Td><Link to={`/disburse/${token.id}`}><ViewIcon/></Link></Td>
-          </Tr>
-        ))}
+        {tokens.map((token, idx) => {
+          const redirect = () => {
+            if(action) {
+              history.push(`/${action}/${token.id}`)
+            }
+          }
+          return (
+            <Tr
+              key={idx} onClick={redirect}
+              _hover={{ bg: action ? '#F3FF0033' : '#0000FF11' }}
+            >
+              <Td>{token.loading ? <Spinner/> : (
+                token.name ?? <em>Unnamed</em>
+              )}</Td>
+              <Td>{token.loading ? <Spinner/> : (
+                <a href={token.image} target="_blank">
+                  <Image maxH="5rem" m="auto" src={token.image}/>
+                </a>
+                ?? <em>No Image</em>
+              )}</Td>
+              <Td>{token.loading ? <Spinner/> : (
+                token.description ? (
+                  `${token.description.split('.')[0]}…`
+                ) : (
+                  <em>No Description</em>
+                )
+              )}</Td>
+              <Td>{token.supply}</Td>
+              <Td><a href={token.metadata}><ExternalLinkIcon/></a></Td>
+              {!action && (
+                <Td>
+                  <Link to={`/disburse/${token.id}`} title="Distribute">
+                    <Button>⛲</Button>
+                  </Link>
+                  <Link to={`/edit/${token.id}`} title="Edit">
+                    <Button>🖊</Button>
+                  </Link>
+                </Td>
+              )}
+            </Tr>
+          )
+        })}
       </Tbody>
     </Table>
   )

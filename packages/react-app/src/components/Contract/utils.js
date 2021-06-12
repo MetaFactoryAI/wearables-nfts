@@ -4,22 +4,19 @@ import { isAddress } from "@ethersproject/address";
 import { Address } from "../../components";
 
 const tryToDisplay = (thing) => {
-  if(thing && thing.toNumber) {
+  if(thing?.toNumber) {
     try {
-      return thing.toNumber();
+      return thing.toNumber()
     } catch (e) {
-      return "Ξ" + formatUnits(thing, "ether");
+      return `Ξ${formatUnits(thing, 'ether')}`
     }
   }
-  if(thing && thing.startsWith && thing.startsWith("0x") && thing.length === 42){
+  if(thing?.startsWith?.('0x') && thing.length === 42) {
     return (
-      <Address
-        address={thing}
-        fontSize={22}
-      />
+      <Address address={thing} fontSize={22}/>
     )
   }
-  return JSON.stringify(thing);
-};
+  return JSON.stringify(thing)
+}
 
-export default tryToDisplay;
+export default tryToDisplay

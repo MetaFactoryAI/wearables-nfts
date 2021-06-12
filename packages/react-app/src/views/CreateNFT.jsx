@@ -1,61 +1,78 @@
-import React, { useState } from 'react'
-import { Form, Input, Layout } from 'antd'
+import { Container, FormControl, FormLabel, Input } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 
-export default ({ contract, treasurer: treasurerParam }) => {
+export default ({
+  contract, treasurer: treasurerParam, validNetwork
+}) => {
   const [quantity, setQuantity] = useState(1)
   const [treasurer, setTreasurer] = useState(treasurerParam)
   const [metadata, setMetadata] = useState('')
+  const history = useHistory()
 
-  const create = (evt) => {
-    //evt.preventDefault()
+  // ToDo: Fix this. The value is initially unset & later values are
+  // ignored as a default value
+  useEffect(() => {
+    if(treasurerParam && !treasurer) {
+      setTreasurer(treasurerParam)
+    }
+  }, [treasurerParam])
+
+  const create = async (evt) => {
+    evt.preventDefault()
     const enact = (
       window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
     )
     if(enact) {
-      contract.mint(treasurer, quantity, metadata, [])
+      await contract.mint(treasurer, quantity, metadata, [])
+      history.push('/')
     }
   }
 
+  if(!contract) {
+    return (
+      <Container>¡Missing Contract!</Container>
+    )
+  }
+
   return (
-    <Layout style={{ maxWidth: '40rem', margin: 'auto' }}>
-      <Form onFinish={create}>
-        <Form.Item
-          label="Quantity"
-          rules={[{ required: true, message: 'Specify a quantity to create.' }]}
-        >
-          <Input
-            type="number"
-            value={quantity}
-            onChange={(evt) => {
-              const val = evt.target.value
-              setQuantity(val && parseInt(val))
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          label="Treasurer"
-          rules={[{ required: true, message: 'Specify the recipient of the new tokens.' }]}
-        >
-          <Input
-            type="text"
-            value={treasurer}
-            onChange={(evt) => {
-              const val = evt.target.value
-              setTreasurer(val)
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          label="Metadata"
-          rules={[{ required: true, message: 'Token metadata.' }]}
-        >
-          <Input
-            value={metadata}
-            onChange={(evt) => setMetadata(evt.target.value)}
-          />
-        </Form.Item>
-       <Input type="submit" value="Create"/>
-      </Form>
-    </Layout>
+    <Container as="form" onSubmit={create}>
+      <FormControl isRequired>
+        <FormLabel>Quantity:</FormLabel>
+        <Input
+          type="number"
+          value={quantity}
+          onChange={(evt) => {
+            const val = evt.target.value
+            setQuantity(val && parseInt(val))
+          }}
+          placeholder="¿How many tokens to mint?"
+        />
+      </FormControl>
+      <FormControl isRequired>
+        <FormLabel>Treasurer:</FormLabel>
+        <Input
+          type="text"
+          value={treasurer}
+          onChange={(evt) => setTreasurer(evt.target.value)}
+          placeholder="¿Who should receive the new tokens?"
+        />
+      </FormControl>
+      <FormControl isRequired>
+        <FormLabel>Metadata:</FormLabel>
+        <Input
+          value={metadata}
+          onChange={(evt) => setMetadata(evt.target.value)}
+          placeholder="ToDo: Automatically generate this…"
+        />
+      </FormControl>
+      <Input
+        mt={2} variant="filled" type="submit" value="Create"
+        title={
+          validNetwork ? 'Create NFTs' : 'Connect to the correct network.'
+        }
+        isDisabled={!validNetwork}
+      />
+    </Container>
   )
 }
