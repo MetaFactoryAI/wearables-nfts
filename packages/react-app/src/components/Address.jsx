@@ -25,12 +25,14 @@ export default (props) => {
     )
   }
 
-  let displayAddress = address.substr(0, 6)
+  let displayAddress = `${address.substr(0, 6)}…`
 
   if(ens && !ens.startsWith("0x")) {
     displayAddress = ens
   } else if(props.size === "short") {
-    displayAddress += `…${address.substr(-4)}`
+    displayAddress += address.substr(-4)
+  } else if(props.size === "medium") {
+    displayAddress += address.substr(-9)
   } else if(props.size === "long") {
     displayAddress = address
   }
@@ -45,11 +47,11 @@ export default (props) => {
   }
 
   return (
-    <Flex>
+    <Flex title={address}>
       <Box verticalAlign="middle">
         <Blockies
           seed={address.toLowerCase()}
-          size={15}
+          size={SecondLine ? 15 : 8}
           scale={props.fontSize ? props.fontSize / 7 : 4}
         />
       </Box>
@@ -63,7 +65,7 @@ export default (props) => {
             {displayAddress}
           </a>
         </Box>
-        {SecondLine && <SecondLine/>}
+        {SecondLine && SecondLine}
       </Box>
     </Flex>
   )

@@ -130,7 +130,7 @@ export default ({ ensProvider }) => {
             )}</Td>
             <Td>{token.supply}</Td>
             <Td><a href={token.metadata}><ExternalLinkIcon/></a></Td>
-            <Td><Link to={`/token/${token.id}`}><ViewIcon/></Link></Td>
+            <Td><Link to={`/disburse/${token.id}`}><ViewIcon/></Link></Td>
           </Tr>
         ))}
       </Tbody>

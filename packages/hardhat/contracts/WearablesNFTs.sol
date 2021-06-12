@@ -34,4 +34,19 @@ contract WearablesNFTs is ERC1155 {
   function tokenCount() public view returns (uint256) {
     return _tokenCount;
   }
+
+  function distributeSingles(
+    address from,
+    address[] to,
+    uint256 memory id,
+    bytes memory data
+  ) public virtual {
+    require(
+      from == _msgSender() || isApprovedForAll(from, _msgSender()),
+      "ERC1155: caller is not owner nor approved"
+    );
+    for (uint256 i = 0; i < to.length; ++i) {
+      _safeTransferFrom(from, to[i], id, 1, data);
+    }
+  }
 }

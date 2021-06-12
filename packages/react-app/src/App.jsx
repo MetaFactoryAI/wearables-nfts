@@ -38,6 +38,7 @@ if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum")
 const mainnetInfura = (
   new StaticJsonRpcProvider(`https://mainnet.infura.io/v3/${INFURA_ID}`)
 )
+const mainnetProvider = mainnetInfura
 
 let localProviderUrl = targetNetwork.rpcUrl
 localProviderUrl = (
@@ -50,37 +51,12 @@ const localProvider = new StaticJsonRpcProvider(localProviderUrl)
 const blockExplorer = targetNetwork.blockExplorer
 
 export default (props) => {
-  const mainnetProvider = mainnetInfura
   const [injectedProvider, setInjectedProvider] = useState()
   const gasPrice = useGasPrice(targetNetwork, 'fast') // EtherGasStation
-  const userProvider = useUserProvider(injectedProvider, localProvider)
-  const address = useUserAddress(userProvider)
-  let localChainId = localProvider?._network?.chainId
-  let selectedChainId = userProvider?._network?.chainId
-  const tx = Transactor(userProvider, gasPrice)
+  const address = useUserAddress(injectedProvider)
+  const tx = Transactor(injectedProvider, gasPrice)
   const readContracts = useContractLoader(localProvider)
-  const writeContracts = useContractLoader(userProvider)
-
-  let NetworkDisplay = () => (
-    <Box
-      zIndex={1} position="absolute"
-      right="13em" top={5}
-      color={targetNetwork.color}
-    >
-      {targetNetwork.name}
-    </Box>
-  )
-  console.info('CHAINS', userProvider?._network, localChainId, selectedChainId)
-  if(localChainId && selectedChainId && localChainId != selectedChainId) {
-    NetworkDisplay = () => (
-      <Box
-        zIndex={2} position="absolute"
-        right={2} top={5}
-      >
-        <ChainAlert {...{ NETWORK, selectedChainId, localChainId }}/>
-      </Box>
-    )
-  }
+  const writeContracts = useContractLoader(injectedProvider)
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect()
@@ -100,15 +76,15 @@ export default (props) => {
 
   return (
     <Box className="App">
-      <Box
-        position="fixed" textAlign="right"
-        right={2} top={2}
-      >
-        <Account
+      <BrowserRouter>
+        <Header
+          minH="4em" pl={10} pt={5}
           {...{
+            NETWORK,
+            targetNetwork,
             address,
             localProvider,
-            userProvider,
+            injectedProvider,
             mainnetProvider,
             web3Modal,
             loadWeb3Modal,
@@ -116,18 +92,8 @@ export default (props) => {
             blockExplorer,
           }}
         />
-      </Box>
-      <NetworkDisplay/>
-
-      <BrowserRouter>
-        <Header minH="4em" pl={10} pt={5}/>
 
         <Switch>
-          <Route path='/'>
-            <ExistingNFTs
-              ensProvider={mainnetProvider}
-            />
-          </Route>
           <Route path='/new'>
             <CreateNFT
               contract={writeContracts?.WearablesNFTs}
@@ -143,6 +109,11 @@ export default (props) => {
               contract={writeContracts?.WearablesNFTs}
             />
           </Route>
+          <Route path='/'>
+            <ExistingNFTs
+              ensProvider={mainnetProvider}
+            />
+          </Route>
         </Switch>
       </BrowserRouter>
 
@@ -150,7 +121,7 @@ export default (props) => {
         position="fixed" textAlign="left"
         left={0} bottom={0} padding={10}
       >
-        <GasGauge gasPrice={gasPrice} />
+        <GasGauge price={gasPrice} />
       </Box>
     </Box>
   )

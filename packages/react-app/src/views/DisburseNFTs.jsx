@@ -83,7 +83,7 @@ export default ({ ensProvider, address, contract }) => {
     <Box>
       <Distribute {...{ isOpen, onClose, quantity, distribute }}/>
       <Table>
-        <Thead>
+        <Thead position="sticky" top="5rem" bg="white" zIndex={10}>
           <Tr><Th>Quantity</Th><Th>Owner</Th><Th>Actions</Th></Tr>
         </Thead>
         <Tbody>

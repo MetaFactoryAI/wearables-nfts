@@ -4,7 +4,7 @@ import {
   ModalCloseButton, ModalBody, ModalFooter,
   Button, Tabs, TabList, TabPanels, Tab, TabPanel,
   FormControl, FormLabel, FormHelperText, Textarea,
-  UnorderedList, ListItem,
+  OrderedList, ListItem,
 } from '@chakra-ui/react'
 import Address from '../components/Address'
 
@@ -29,10 +29,10 @@ export default ({
   const process = async () => {
     try {
       await distribute(addresses)
+      onClose()
     } catch(err) {
       console.error(err)
     }
-    onClose()
   }
 
   const InputTabs = () => (
@@ -54,15 +54,15 @@ export default ({
           </FormControl>
         </TabPanel>
         <TabPanel>
-          <UnorderedList>
+          <OrderedList>
             {addresses.map((addr) => (
-              <ListItem key={addr}>
+              <ListItem key={addr} justifyContent="center">
                 <Address
-                  value={addr} size="short" {...{ ensProvider }}
+                  value={addr} size="medium" {...{ ensProvider }}
                 />
               </ListItem>
             ))}
-          </UnorderedList>
+          </OrderedList>
         </TabPanel>
       </TabPanels>
     </Tabs>
