@@ -1,6 +1,6 @@
 import React, { useEffect , useState} from 'react'
 import {
-  Alert, AlertIcon, Spinner, Stack, Button,
+  Alert, AlertIcon, Spinner, Button,
   Table, Thead, Tbody, Tr, Th, Td, useDisclosure,
   Box, Image, Flex, Heading, useToast,
 } from '@chakra-ui/react'
@@ -14,6 +14,7 @@ const TOKEN = gql(`
   query GetToken($id: String!) {
     token(id: $id) {
       identifier
+      totalSupply
       balances {
         account { id }
         value
@@ -62,24 +63,21 @@ export default ({
   }
 
   useEffect(() => {
-    if(data?.token.balances) {
+    if(data?.token) {
+      const { balances, totalSupply, identifier, URI } = (
+        data.token
+      )
       const quantities = Object.fromEntries(
-        data.token.balances.map((bal) => [
+        balances.map((bal) => [
           bal.account.id,
           parseInt(bal.value, 10),
         ])
       )
       setBalances(quantities)
-      setTotal(
-        Object.values(quantities)
-        .reduce((a, b) => a + b, 0)
-      )
-    }
-    if(data?.token.identifier) {
-      setTokenID(data.token.identifier)
-    }
-    if(data?.token.URI) {
-      fetch(httpURL(data.token.URI))
+      setTotal(totalSupply)
+      setTokenID(identifier)
+
+      fetch(httpURL(URI))
       .then(res => res.json())
       .then((meta) => {
         setMeta(
@@ -93,7 +91,7 @@ export default ({
         )
       })
     }
-  }, [data?.token?.balances])
+  }, [data])
 
   if(loading) {
     return <Spinner/>

@@ -1,7 +1,7 @@
 import React from 'react'
 import Blockies from 'react-blockies'
 import {
-  Flex, Box, Text, Stack, SkeletonText, SkeletonCircle,
+  Flex, Box, SkeletonText, SkeletonCircle,
 } from '@chakra-ui/react'
 import { useLookupAddress } from '../hooks'
 

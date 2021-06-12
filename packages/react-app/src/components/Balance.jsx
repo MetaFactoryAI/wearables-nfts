@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { formatEther } from '@ethersproject/units'
 import { Flex, Image } from '@chakra-ui/react'
 import { useBalance } from '../hooks'

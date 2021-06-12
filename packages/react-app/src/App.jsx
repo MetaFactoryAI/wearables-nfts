@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import {
+  HashRouter as Router, Switch, Route,
+} from 'react-router-dom'
 import {
   StaticJsonRpcProvider, Web3Provider,
 } from '@ethersproject/providers'
@@ -12,8 +14,9 @@ import { Header } from './components'
 import { INFURA_ID, NETWORK, NETWORKS } from './constants'
 import ExistingNFTs from './views/ExistingNFTs'
 import CreateNFT from './views/CreateNFT'
-import UpdateNFT from './views/UpdateNFT'
 import DisburseOrList from './views/DisburseOrList'
+import EditOrList from './views/EditOrList'
+import ViewOrList from './views/ViewOrList'
 
 const targetNetwork = NETWORKS['rinkeby'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 const mainnetInfura = (
@@ -56,7 +59,7 @@ export default (props) => {
 
   return (
     <Box className="App">
-      <BrowserRouter>
+      <Router>
         <Header
           minH="4em" pl={10} pt={5}
           {...{
@@ -81,8 +84,13 @@ export default (props) => {
               {...{ validNetwork }}
             />
           </Route>
-          <Route path='/edit/:id?' component={UpdateNFT}/>
-          {/* <Route path='/view/:id?' component={NFTDetails}/> */}
+          <Route path='/edit/:id?'>
+            <EditOrList
+              {...{ validNetwork }}
+              contract={writeContracts?.WearablesNFTs}
+            />
+          </Route>
+          <Route path='/view/:id?' component={ViewOrList}/>
           <Route path='/disburse/:id?'>
             <DisburseOrList
               {...{ address, validNetwork }}
@@ -94,7 +102,7 @@ export default (props) => {
             <ExistingNFTs ensProvider={mainnetProvider}/>
           </Route>
         </Switch>
-      </BrowserRouter>
+      </Router>
     </Box>
   )
 }

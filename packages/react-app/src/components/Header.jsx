@@ -3,12 +3,12 @@ import {
   Box, Button, chakra, Flex, Image, Spacer, Stack, Text, Tooltip,
   ButtonGroup,
 } from '@chakra-ui/react'
-import { Link, useLocation, useRouteMatch } from 'react-router-dom'
-import "@fontsource/crimson-text/600.css"
-import logo from '../logo.svg'
+import { LoginOutlined, LogoutOutlined } from "@ant-design/icons"
+import { Link, useLocation } from 'react-router-dom'
 import ChainAlert from "./ChainAlert"
 import Account from "./Account"
-import { LoginOutlined, LogoutOutlined } from "@ant-design/icons"
+import logo from '../logo.svg'
+import "@fontsource/crimson-text/600.css"
 
 export default ({
   NETWORK, address, blockExplorer, targetNetwork,
@@ -26,13 +26,19 @@ export default ({
   }
   const links = {
     '/': {
-      title: 'List Existing NFTs', icon: '🗃',
+      title: 'List Existing NFTs', icon: '🗃️',
     },
     '/new': {
       title: 'Create a New NFT', icon: '➕',
     },
     '/disburse': {
       title: 'Distribute Existing NFTs', icon: '⛲',
+    },
+    '/view': {
+      title: 'View NFT', icon: '👁️',
+    },
+    '/edit': {
+      title: 'Edit NFT Metadata', icon: '✏️',
     },
   }
   const path = location.pathname.replace(/^(\/[^/]*)(\/.+)?$/, (str, group) => group) 

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Alert, AlertIcon, Button, Spinner, Image,
   Table, Thead, Tbody, Tr, Th, Td, Container,
 } from '@chakra-ui/react'
-import { ExternalLinkIcon, ViewIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Link, useHistory } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
 import registryAddress from '../contracts/WearablesNFTs.address'
@@ -22,11 +22,11 @@ const TOKENS = gql(`
   }
 `)
 
-export default ({ ensProvider, action = null }) => {
+export default ({ action = null }) => {
   const { loading, error, data } = useQuery(TOKENS)
   const [tokens, setTokens] = useState(null) 
   const history = useHistory()
-  const load = async () => {
+  const load = useCallback(async () => {
     if(data) {
       const tokenData = data?.tokenRegistry?.tokens
       if(!tokenData) {
@@ -63,9 +63,9 @@ export default ({ ensProvider, action = null }) => {
         }
       }))
     }
-  }
+  }, [data])
 
-  useEffect(() => { load() }, [data])
+  useEffect(() => { load() }, [load])
   
   if(error) {
     return (
@@ -122,7 +122,10 @@ export default ({ ensProvider, action = null }) => {
                 token.name ?? <em>Unnamed</em>
               )}</Td>
               <Td>{token.loading ? <Spinner/> : (
-                <a href={token.image} target="_blank">
+                <a
+                  href={token.image}
+                  target="_blank" rel="noopener noreferrer"
+                >
                   <Image maxH="5rem" m="auto" src={token.image}/>
                 </a>
                 ?? <em>No Image</em>
@@ -139,10 +142,25 @@ export default ({ ensProvider, action = null }) => {
               {!action && (
                 <Td>
                   <Link to={`/disburse/${token.id}`} title="Distribute">
-                    <Button>⛲</Button>
+                    <Button borderWidth={3} variant="outline">
+                      <span role="img" aria-label="Distribute">
+                        ⛲
+                      </span>
+                    </Button>
+                  </Link>
+                  <Link to={`/view/${token.id}`} title="View">
+                    <Button>
+                      <span role="img" aria-label="View">
+                        👁️
+                      </span>
+                    </Button>
                   </Link>
                   <Link to={`/edit/${token.id}`} title="Edit">
-                    <Button>🖊</Button>
+                    <Button>
+                      <span role="img" aria-label="Edit">
+                        ✏️
+                      </span>
+                    </Button>
                   </Link>
                 </Td>
               )}

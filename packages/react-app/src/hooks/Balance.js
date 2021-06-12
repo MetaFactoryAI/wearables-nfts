@@ -34,12 +34,12 @@ export default (provider, address, pollTime = 0) => {
         }
       }
     },
-    [provider, address],
+    [balance],
   )
 
   useEffect(
     () => { pollBalance(provider, address) },
-    [pollBalance]
+    [pollBalance, provider, address]
   )
 
   // Only pass a provider to watch on a block if there is no pollTime

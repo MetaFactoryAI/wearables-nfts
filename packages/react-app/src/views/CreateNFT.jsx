@@ -16,7 +16,7 @@ export default ({
     if(treasurerParam && !treasurer) {
       setTreasurer(treasurerParam)
     }
-  }, [treasurerParam])
+  }, [treasurerParam, treasurer])
 
   const create = async (evt) => {
     evt.preventDefault()
@@ -31,7 +31,7 @@ export default ({
 
   if(!contract) {
     return (
-      <Container>¡Missing Contract!</Container>
+      <Container align="center">¡Missing Contract!</Container>
     )
   }
 
