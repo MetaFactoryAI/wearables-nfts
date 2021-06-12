@@ -90,7 +90,9 @@ export default (props) => {
               contract={writeContracts?.WearablesNFTs}
             />
           </Route>
-          <Route path='/view/:id?' component={ViewOrList}/>
+          <Route path='/view/:id?'>
+            <ViewOrList {...{ validNetwork }}/>
+          </Route>
           <Route path='/disburse/:id?'>
             <DisburseOrList
               {...{ address, validNetwork }}

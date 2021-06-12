@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import {
   Alert, AlertIcon, Button, Spinner, Image,
-  Table, Thead, Tbody, Tr, Th, Td, Container,
+  Table, Thead, Tbody, Tr, Th, Td, Container, Box, useColorMode,
 } from '@chakra-ui/react'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Link, useHistory } from 'react-router-dom'
@@ -24,7 +24,8 @@ const TOKENS = gql(`
 
 export default ({ action = null }) => {
   const { loading, error, data } = useQuery(TOKENS)
-  const [tokens, setTokens] = useState(null) 
+  const [tokens, setTokens] = useState(null)
+  const { colorMode } = useColorMode()
   const history = useHistory()
   const load = useCallback(async () => {
     if(data) {
@@ -66,20 +67,22 @@ export default ({ action = null }) => {
   }, [data])
 
   useEffect(() => { load() }, [load])
-  
-  console.info('List')
 
   if(error) {
     return (
-      <Alert status="error">
+      <Container mt={10}><Alert status="error">
         <AlertIcon />
         {error}
-      </Alert>
+      </Alert></Container>
     )
   }
 
   if(!tokens || loading) {
-    return <Spinner/>
+    return (
+      <Box align="center" my={10}>
+        <Spinner/>
+      </Box>
+    )
   }
 
   if(tokens.length === 0) {
@@ -94,17 +97,18 @@ export default ({ action = null }) => {
 
   return (
     <Table
-      sx={{
-        'th, td': { textAlign: 'center' },
-      }}
+      sx={{ 'th, td': { textAlign: 'center' } }}
     >
       <Thead>
-        <Tr position="sticky" top="5rem" bg="white" zIndex={2}>
+        <Tr
+          position="sticky" top={[0, 14]} zIndex={1}
+          bg={colorMode === 'dark' ? 'gray.800' : 'white'}
+        >
           <Th>Name</Th>
           <Th>Image</Th>
-          <Th>Description</Th>
-          <Th>Supply</Th>
-          <Th>Metadata</Th>
+          <Th display={['none', 'table-cell']}>Description</Th>
+          <Th display={['none', 'table-cell']}>Supply</Th>
+          <Th display={['none', 'table-cell']}>Metadata</Th>
           {!action && <Th>Actions</Th>}
         </Tr>
       </Thead>
@@ -132,15 +136,23 @@ export default ({ action = null }) => {
                 </a>
                 ?? <em>No Image</em>
               )}</Td>
-              <Td>{token.loading ? <Spinner/> : (
-                token.description ? (
-                  `${token.description.split('.')[0]}…`
-                ) : (
-                  <em>No Description</em>
-                )
-              )}</Td>
-              <Td>{token.supply}</Td>
-              <Td><a href={token.metadata}><ExternalLinkIcon/></a></Td>
+              <Td display={['none', 'table-cell']}>
+                {token.loading ? <Spinner/> : (
+                  token.description ? (
+                    `${token.description.split('.')[0]}…`
+                  ) : (
+                    <em>No Description</em>
+                  )
+                )}
+              </Td>
+              <Td display={['none', 'table-cell']}>
+                {token.supply}
+              </Td>
+              <Td display={['none', 'table-cell']}>
+                <a href={token.metadata}>
+                  <ExternalLinkIcon/>
+                </a>
+              </Td>
               {!action && (
                 <Td>
                   {

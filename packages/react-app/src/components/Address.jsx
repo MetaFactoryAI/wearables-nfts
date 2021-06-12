@@ -12,7 +12,7 @@ const blockExplorerLink = (
 )
 
 export default (props) => {
-  const { SecondLine } = props
+  const { SecondLine = null } = props
   const address = props.value ?? props.address
   const ens = useLookupAddress(props.ensProvider, address)
 
@@ -48,11 +48,13 @@ export default (props) => {
 
   return (
     <Flex title={address}>
-      <Blockies
-        seed={address.toLowerCase()}
-        size={SecondLine ? 15 : 8}
-        scale={props.fontSize ? props.fontSize / 7 : 4}
-      />
+      <Box onClick={() => props.blockieClick?.()}>
+        <Blockies
+          seed={address.toLowerCase()}
+          size={SecondLine ? 15 : 8}
+          scale={props.fontSize ? props.fontSize / 7 : 4}
+        />
+      </Box>
       <Box ml={2} mr={2}>
         <Box {...textProps}>
           <a
@@ -63,7 +65,7 @@ export default (props) => {
             {displayAddress}
           </a>
         </Box>
-        {SecondLine && SecondLine}
+        {SecondLine}
       </Box>
     </Flex>
   )

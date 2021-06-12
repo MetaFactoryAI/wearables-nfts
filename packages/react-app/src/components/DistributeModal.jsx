@@ -8,6 +8,41 @@ import {
 } from '@chakra-ui/react'
 import Address from './Address'
 
+const InputTabs = ({
+  text, raw, update, addresses, ensProvider,
+}) => (
+  <Tabs isFitted variant="enclosed">
+    <TabList mb="1em">
+      <Tab>CSV</Tab>
+      <Tab>Parsed</Tab>
+    </TabList>
+    <TabPanels>
+      <TabPanel>
+        <FormControl>
+          <FormLabel>Comma Separated ETH Addresses</FormLabel>
+          <Textarea
+            placeholder="Enter space, semicolon, or comma separated eth addresses."
+            ref={text} value={raw} minH="6em"
+            onChange={(evt) => update(evt.target.value)}
+          />
+          <FormHelperText>Each address will get one token.</FormHelperText>
+        </FormControl>
+      </TabPanel>
+      <TabPanel>
+        <OrderedList>
+          {addresses.map((addr) => (
+            <ListItem key={addr} justifyContent="center">
+              <Address
+                value={addr} size="medium" {...{ ensProvider }}
+              />
+            </ListItem>
+          ))}
+        </OrderedList>
+      </TabPanel>
+    </TabPanels>
+  </Tabs>
+)
+
 export default ({
   isOpen = false, onClose, quantity, ensProvider,
   distribute,
@@ -31,42 +66,9 @@ export default ({
       await distribute(addresses)
       onClose()
     } catch(err) {
-      console.error(err)
+      console.error('Distribution Error', err)
     }
   }
-
-  const InputTabs = () => (
-    <Tabs isFitted variant="enclosed">
-      <TabList mb="1em">
-        <Tab>CSV</Tab>
-        <Tab>Parsed</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          <FormControl>
-            <FormLabel>Comma Separated ETH Addresses</FormLabel>
-            <Textarea
-              placeholder="Enter space, semicolon, or comma separated eth addresses."
-              ref={text} value={raw} minH="6em"
-              onChange={evt => update(evt.target.value)}
-            />
-            <FormHelperText>Each address will get one token.</FormHelperText>
-          </FormControl>
-        </TabPanel>
-        <TabPanel>
-          <OrderedList>
-            {addresses.map((addr) => (
-              <ListItem key={addr} justifyContent="center">
-                <Address
-                  value={addr} size="medium" {...{ ensProvider }}
-                />
-              </ListItem>
-            ))}
-          </OrderedList>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
-  )
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={text}>
@@ -77,7 +79,13 @@ export default ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <InputTabs/>
+          <InputTabs {...{
+            text,
+            raw,
+            update,
+            addresses,
+            ensProvider,
+          }}/>
         </ModalBody>
         <ModalFooter>
           <Button

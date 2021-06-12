@@ -4,12 +4,12 @@ import { useParams } from 'react-router-dom'
 import NFTDetails from './NFTDetails'
 import ExistingNFTs from './ExistingNFTs'
 
-export default () => {
+export default ({ validNetwork }) => {
   const params = useParams()
 
   if(params.id) {
     return (
-      <NFTDetails/>
+      <NFTDetails {...{ validNetwork }}/>
     )
   } else {
     return (

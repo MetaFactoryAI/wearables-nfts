@@ -1,6 +1,6 @@
 import {
   Spinner, Container, UnorderedList, ListItem, Box,
-  Image, Heading, Alert, AlertIcon,
+  Image, Heading, Alert, AlertIcon, useToast,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
@@ -27,33 +27,52 @@ export default ({ contract, validNetwork }) => {
   const wearables = metadata?.properties?.wearables ?? {}
   const history = useHistory()
   const params = useParams()
+  const toast = useToast()
 
-  let id = params.id
+  let id = params.id?.toLowerCase()
   if(!id.includes('-')) {
     if(!id.startsWith('0x')) id = `0x${id}`
-    id = `${contractAddress}-${id}`
+    id = `${contractAddress.toLowerCase()}-${id}`
   }
-  let { loading, error, data } = useQuery(
+
+  let { loading, error: qError, data } = useQuery(
     TOKEN, { variables: { id } },
   )
+  const [error, setError] = useState(qError)
 
   useEffect(() => {
-    if(data?.token) {
-      setTokenId(data.token.identifier)
-
-      ;(async () => {
-        const res = await fetch(httpURL(data.token.URI))
-        if(res.ok) {
-          try {
-            const metadata = await res.json()
-            setMetadata(metadata)
-          } catch(err) { // invalid JSON
-            setMetadata(null)
-          }
-        } else {
-          console.error('Metadata Response', res)
+    if(data) {
+      if(!data.token) {
+        let msg = `No data returned for the token ${id}.`
+        if(!validNetwork) {
+          msg += ' You are not connected to the right network…'
         }
-      })()
+        setError(msg)
+      } else {
+        setError(null)
+        setTokenId(data.token.identifier)
+
+        ;(async () => {
+          const res = await fetch(httpURL(data.token.URI))
+          if(res.ok) {
+            try {
+              const metadata = await res.json()
+              setMetadata(metadata)
+            } catch(err) { // invalid JSON
+              setMetadata(null)
+            }
+          } else {
+            console.error('Metadata Response', res)
+            toast({
+              title: 'Query Error',
+              description: res.error,
+              status: 'error',
+              duration: null,
+              isClosable: true,
+            })
+          }
+        })()
+      }
     }
   }, [data])
 
@@ -65,10 +84,10 @@ export default ({ contract, validNetwork }) => {
 
   if(error) {
     return (
-      <Alert status="error">
+      <Container mt={10}><Alert status="error">
         <AlertIcon />
         {error}
-      </Alert>
+      </Alert></Container>
     )
   }
 
@@ -86,7 +105,9 @@ export default ({ contract, validNetwork }) => {
 
   return (
     <Container sx={{ a: { textDecoration: 'underline' } }}>
-      <Heading size="md" my={5} align="center">{metadata.name}</Heading>
+      <Heading size="md" my={5} align="center">
+        {metadata.name}
+      </Heading>
       <UnorderedList>
         <ListItem>Token ID: {tokenId}</ListItem>
         <ListItem>Description:
@@ -98,7 +119,9 @@ export default ({ contract, validNetwork }) => {
         </ListItem>
         <ListItem>Homepage:{' '}
           {homepage ? (
-            <a href={homepage}>{homepage}</a>
+            <a href={homepage} target="_blank">
+              {homepage}
+            </a>
           ) : <em>None</em>}
         </ListItem>
         <ListItem>Image:
@@ -109,9 +132,13 @@ export default ({ contract, validNetwork }) => {
             <em>None</em>
           ) : (
             <UnorderedList>
-              {Object.entries(wearables).map(([mimetype, model]) => (
-                <ListItem><a href={httpURL(model)}>{mimetype}</a></ListItem>
-              ))}
+              {Object.entries(wearables).map(
+                ([mimetype, model]) => (
+                  <ListItem>
+                    <a href={httpURL(model)}>{mimetype}</a>
+                  </ListItem>
+                )
+              )}
             </UnorderedList>
           )}
         </ListItem>

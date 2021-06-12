@@ -1,14 +1,15 @@
 import React, { useEffect , useState} from 'react'
 import {
-  Alert, AlertIcon, Spinner, Button,
+  Alert, AlertIcon, Spinner, Button, Tooltip,
   Table, Thead, Tbody, Tr, Th, Td, useDisclosure,
-  Box, Image, Flex, Heading, useToast,
+  Box, Image, Flex, Heading, useToast, useBreakpointValue, useColorMode,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
 import { useParams } from 'react-router'
 import Address from '../components/Address'
 import Distribute from '../components/DistributeModal'
 import { httpURL } from '../helpers'
+import contractAddress from '../contracts/WearablesNFTs.address'
 
 const TOKEN = gql(`
   query GetToken($id: String!) {
@@ -32,16 +33,36 @@ export default ({
   const [tokenID, setTokenID] = useState(null)
   const [total, setTotal] = useState(null)
   const [meta, setMeta] = useState(<Spinner/>)
+  const { colorMode }= useColorMode()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   const params = useParams()
-  const id = params.id
+  const addrSize = (
+    useBreakpointValue(['shortest', 'medium'])
+  )
+
+  let id = params.id?.toLowerCase()
+  if(!id.includes('-')) {
+    if(!id.startsWith('0x')) id = `0x${id}`
+    id = `${contractAddress.toLowerCase()}-${id}`
+  }
+
   let { loading, error, data } = useQuery(
     TOKEN, { variables: { id } },
   )
   const config = () => {
-    setQuantity(balances[address.toLowerCase()])
-    onOpen()
+    if(!validNetwork) {
+      toast({
+        title: 'Connection Error',
+        description: 'Connect to the correct network to distribute.',
+        status: 'error',
+        duration: 7000,
+        isClosable: true,
+      })
+    } else {
+      setQuantity(balances[address.toLowerCase()])
+      onOpen()
+    }
   }
   const distribute = async (recipients) => {
     try {
@@ -55,7 +76,7 @@ export default ({
         title: "Couldn't Distribute",
         description: cause.message,
         status: 'error',
-        duration: 9000,
+        duration: null,
         isClosable: true,
       })
       throw cause
@@ -114,11 +135,17 @@ export default ({
     <Box>
       <Distribute {...{ isOpen, onClose, quantity, distribute }}/>
       {meta}
-      <Table>
-        <Thead position="sticky" top="5rem" bg="white" zIndex={9}>
+      <Table sx={{ 'th, td': { textAlign: 'center' } }}>
+        <Thead
+          position="sticky" top={[0, 14]} zIndex={1}
+          bg={colorMode === 'dark' ? 'gray.800' : 'white'}
+        >
           <Tr>
-            <Th>Quantity{total && `(${total})`}</Th>
-            <Th>Owner</Th><Th>Actions</Th>
+            <Th textAlign="center">
+              Quantity {total && `(${total})`}
+            </Th>
+            <Th>Owner</Th>
+            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -126,18 +153,17 @@ export default ({
             <Tr key={account}>
               <Td>{amount}</Td>
               <Td><Address
-                value={account} size="medium"
+                value={account} size={addrSize}
                 {...{ ensProvider }}
               /></Td>
               <Td>
-                {account.toLowerCase() === address.toLowerCase() && (
-                  <Button
-                    onClick={config} isDisabled={!validNetwork}
-                    title={
-                      validNetwork ? 'Drop NFTs' : 'Connect to the correct network.'
-                    }
-                  >
-                    Distribute
+                {account?.localeCompare(
+                  address, undefined, { sensitivity: 'base' }
+                ) === 0 && (
+                  <Button onClick={config}>
+                    <span role="img" aria-label="Distribute">
+                      ⛲
+                    </span>
                   </Button>
                 )}
               </Td>

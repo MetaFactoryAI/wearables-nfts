@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import { useLocation } from 'react-router-dom'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { SaveOutlined } from '@ant-design/icons'
+import contractAddress from '../contracts/WearablesNFTs.address'
 import { httpURL } from '../helpers'
 import EditOrList from './EditOrList'
 
@@ -36,7 +37,13 @@ export default ({ contract, validNetwork }) => {
   const [wearables, setWearables] = useState({})
   const query = useQueryParams()
   const params = useParams()
-  let id = params.id
+
+  let id = params.id?.toLowerCase()
+  if(!id.includes('-')) {
+    if(!id.startsWith('0x')) id = `0x${id}`
+    id = `${contractAddress.toLowerCase()}-${id}`
+  }
+
   let { loading, error, data } = useQuery(
     TOKEN, { variables: { id } },
   )
@@ -73,10 +80,10 @@ export default ({ contract, validNetwork }) => {
 
   if(error) {
     return (
-      <Alert status="error">
+      <Container mt={10}><Alert status="error">
         <AlertIcon />
         {error}
-      </Alert>
+      </Alert></Container>
     )
   }
 
@@ -106,7 +113,14 @@ export default ({ contract, validNetwork }) => {
             onChange={(evt) => (
               setNewMetadata(evt.target.value)
             )}
-            placeholder="Metadata is corrupt. Provide a replacement."
+            placeholder={(() => {
+              let msg = ((metadata === null) ? (
+                "Metadata is corrupt."
+              ) : (
+                "Metadata override specified."
+              ))
+              return `${msg} Provide a replacement.`
+            })}
           />
         </FormControl>
         <Button
@@ -122,11 +136,16 @@ export default ({ contract, validNetwork }) => {
   }
 
   return (
-    <Flex direction="row-reverse" align="center">
-      <IconButton aria-label="Save" title="Save" icon={<SaveOutlined/>}/>
+    <Flex
+      direction="row-reverse" align="center"
+      justify="flex-start" mt={10}
+    >
+      <IconButton
+        aria-label="Save" title="Save" icon={<SaveOutlined/>}
+      />
       <Container sx={{ a: { textDecoration: 'underline' } }}>
-        <UnorderedList listStyleType="disclosure-closed">
-          <ListItem>
+        <UnorderedList>
+          <ListItem listStyleType="square">
             <FormControl>
               <Flex align="center">
                 <FormLabel>Name:</FormLabel>
@@ -137,7 +156,9 @@ export default ({ contract, validNetwork }) => {
               </Flex>
             </FormControl>
           </ListItem>
-          <ListItem>Description:
+          <ListItem
+            listStyleType="disclosure-open"
+          >Description:
             <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
               <TabList mb="1em">
                 <Tab>Markdown</Tab>

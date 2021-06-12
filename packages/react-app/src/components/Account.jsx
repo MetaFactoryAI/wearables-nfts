@@ -4,9 +4,9 @@ import Address from './Address'
 import Balance from './Balance'
 
 export default ({
-  address, minimized,
-  injectedProvider, mainnetProvider, blockExplorer,
-  ...props
+  address, minimized, blockExplorer,
+  injectedProvider, mainnetProvider,
+  localProvider, blockieClick, ...props
 }) => (
   minimized ? null : (
     <Flex {...props}>
@@ -14,7 +14,10 @@ export default ({
         "Connecting…"
       ) : (
         <Address
-          {...{ address, blockExplorer }}
+          {...{
+            address, blockExplorer,
+            blockieClick,
+          }}
           ensProvider={mainnetProvider}
           size="short"
           SecondLine={
