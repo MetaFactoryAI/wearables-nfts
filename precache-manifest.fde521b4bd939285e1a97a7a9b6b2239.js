@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "7dd9ff3d88a7c1015a60e4eb27d59197",
+    "revision": "2e41421aada45b1a53d72dec675f17ea",
     "url": "/nft-wearable/index.html"
   },
   {
