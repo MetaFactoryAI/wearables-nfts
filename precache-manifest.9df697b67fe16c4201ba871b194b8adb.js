@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2e41421aada45b1a53d72dec675f17ea",
+    "revision": "1cfd0d1a1fa2c23de4929427a9716713",
     "url": "/nft-wearable/index.html"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/nft-wearable/static/js/2.2c237837.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "2c4bc22e7c6f2a2c94c7",
-    "url": "/nft-wearable/static/js/main.9cc1804d.chunk.js"
+    "revision": "a19b31671f892e4f8757",
+    "url": "/nft-wearable/static/js/main.563bd0f1.chunk.js"
   },
   {
     "revision": "996052db87d46957cbd9",
