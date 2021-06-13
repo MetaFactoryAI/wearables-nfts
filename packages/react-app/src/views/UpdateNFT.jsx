@@ -1,10 +1,12 @@
 import {
   chakra, Button, Spinner, FormControl, Container, Input,
-  FormLabel, UnorderedList, ListItem, Box, Image,
-  Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex, Alert, AlertIcon, IconButton,
+  FormLabel, UnorderedList, ListItem, Box, Image, Tooltip,
+  Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex,
+  Alert, AlertIcon, IconButton, Text, useBreakpointValue,
+  ButtonGroup,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { useLocation } from 'react-router-dom'
@@ -36,8 +38,14 @@ export default ({ contract, validNetwork }) => {
   const [homepage, setHomepage] = useState('')
   const [wearables, setWearables] = useState({})
   const query = useQueryParams()
-  const params = useParams()
+  const saveLabel = useBreakpointValue(['Save', ''])
+  
+  const [hide, setHide] = useState({})
+  const toggle = useCallback((prop) => {
+    setHide(h => ({ ...h, [prop]: !h[prop] }))
+  }, [])
 
+  const params = useParams()
   let id = params.id?.toLowerCase()
   if(!id.includes('-')) {
     if(!id.startsWith('0x')) id = `0x${id}`
@@ -105,7 +113,7 @@ export default ({ contract, validNetwork }) => {
 
   if(metadata === null || query.get('overwrite')) {
     return (
-      <Container as="form" onSubmit={overwrite}>
+      <Container as="form" onSubmit={overwrite} mt={10}>
         <FormControl isRequired>
           <FormLabel>New Metadata</FormLabel>
           <Input
@@ -135,15 +143,26 @@ export default ({ contract, validNetwork }) => {
     )
   }
 
+  const save = () => {
+    console.info("Saving…")
+  }
+
   return (
     <Flex
-      direction="row-reverse" align="center"
-      justify="flex-start" mt={10}
+      direction={['column-reverse', 'row-reverse']}
+      align="center" justify="center" mt={10}
     >
-      <IconButton
-        aria-label="Save" title="Save" icon={<SaveOutlined/>}
-      />
-      <Container sx={{ a: { textDecoration: 'underline' } }}>
+      <Tooltip hasArrow placement="top" label="Save">
+        <ButtonGroup
+          isAttached variant="outline" mt={5} onClick={save}
+        >
+          <IconButton
+            aria-label="Save" title="Save" icon={<SaveOutlined/>}
+          />
+          {saveLabel && <Button>{saveLabel}</Button>}
+        </ButtonGroup>
+      </Tooltip>
+      <Container m={0} sx={{ a: { textDecoration: 'underline' } }}>
         <UnorderedList>
           <ListItem listStyleType="square">
             <FormControl>
@@ -157,30 +176,37 @@ export default ({ contract, validNetwork }) => {
             </FormControl>
           </ListItem>
           <ListItem
-            listStyleType="disclosure-open"
-          >Description:
-            <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
-              <TabList mb="1em">
-                <Tab>Markdown</Tab>
-                <Tab>Preview</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <Textarea
-                    placeholder="Enter a markdown formatted description."
-                    value={description} minH="8em"
-                    onChange={evt => setDescription(evt.target.value)}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <ReactMarkdown>
-                    {description}
-                  </ReactMarkdown>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+            listStyleType={
+              `disclosure-${hide['desc'] ? 'closed' : 'open'}`
+            }
+          >
+            <Text onClick={() => toggle('desc')}>
+              Description:
+            </Text>
+            {!hide['desc'] && (
+              <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
+                <TabList mb="1em">
+                  <Tab>Markdown</Tab>
+                  <Tab>Preview</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <Textarea
+                      placeholder="Enter a markdown formatted description."
+                      value={description} minH="8em"
+                      onChange={evt => setDescription(evt.target.value)}
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <ReactMarkdown>
+                      {description}
+                    </ReactMarkdown>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            )}
           </ListItem>
-          <ListItem>
+          <ListItem listStyleType="square">
             <FormControl>
               <Flex align="center">
                 <FormLabel>Homepage:</FormLabel>
@@ -196,17 +222,30 @@ export default ({ contract, validNetwork }) => {
               </Flex>
             </FormControl>
           </ListItem>
-          <ListItem>Image:
-            <Image src={httpURL(metadata.image)} maxH="15em"/>
+          <ListItem
+            listStyleType={
+              `disclosure-${hide['img'] ? 'closed' : 'open'}`
+            }
+          >
+            <Text onClick={() => toggle('img')}>
+              Image:
+            </Text>
+            {!hide['img'] && (
+              <Image src={httpURL(metadata.image)} maxH={60}/>
+            )}
           </ListItem>
           <ListItem>Models:{' '}
             {Object.keys(wearables).length === 0 ? (
               <em>None</em>
             ) : (
               <UnorderedList>
-                {Object.entries(wearables).map(([mimetype, model]) => (
-                  <ListItem><a href={httpURL(model)}>{mimetype}</a></ListItem>
-                ))}
+                {Object.entries(wearables).map(
+                  ([mimetype, model]) => (
+                    <ListItem>
+                      <a href={httpURL(model)}>{mimetype}</a>
+                    </ListItem>
+                  )
+                )}
               </UnorderedList>
             )}
           </ListItem>

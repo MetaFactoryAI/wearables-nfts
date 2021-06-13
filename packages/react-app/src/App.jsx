@@ -79,9 +79,9 @@ export default (props) => {
         <Switch>
           <Route path='/new'>
             <CreateNFT
+              {...{ validNetwork }}
               contract={writeContracts?.WearablesNFTs}
               treasurer={address}
-              {...{ validNetwork }}
             />
           </Route>
           <Route path='/edit/:id?'>
@@ -110,8 +110,8 @@ export default (props) => {
 }
 
 const web3Modal = new Web3Modal({
-  // network: 'mainnet', // optional
-  cacheProvider: true, // optional
+  network: targetNetwork.name, // optional
+  cacheProvider: true,         // optional
   providerOptions: {
     walletconnect: {
       package: WalletConnectProvider, // required
@@ -120,7 +120,7 @@ const web3Modal = new Web3Modal({
       },
     },
   },
-});
+})
 
 const logoutOfWeb3Modal = async () => {
   await web3Modal.clearCachedProvider()

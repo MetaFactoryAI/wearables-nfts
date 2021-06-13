@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Alert, AlertIcon, Button, Spinner, Image,
+  Alert, AlertIcon, Button, Spinner, Image, Tooltip,
   Table, Thead, Tbody, Tr, Th, Td, Container, Box, useColorMode,
 } from '@chakra-ui/react'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
@@ -162,19 +162,24 @@ export default ({ action = null }) => {
                       edit: { title: 'Edit', icon: '✏️' },
                     })
                     .map(([action, { title, icon }]) => (
-                      <Link
-                        to={`/${action}/${token.id}`}
-                        key={action} {...{ title }}
+                      <Tooltip
+                        label={title} key={action}
+                        hasArrow placement="left"
                       >
-                        <Button
-                          borderWidth={3} variant="outline"
-                          _hover={{ bg: '#00FF0044' }}
+                        <Link
+                          to={`/${action}/${token.id}`}
+                          {...{ title }}
                         >
-                          <span role="img" aria-label={title}>
-                            {icon}
-                          </span>
-                        </Button>
-                      </Link>
+                          <Button
+                            borderWidth={3} variant="outline"
+                            _hover={{ bg: '#00FF0044' }}
+                          >
+                            <span role="img" aria-label={title}>
+                              {icon}
+                            </span>
+                          </Button>
+                        </Link>
+                      </Tooltip>
                     ))
                   }
                 </Td>

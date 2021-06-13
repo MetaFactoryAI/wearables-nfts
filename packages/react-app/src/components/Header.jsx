@@ -126,7 +126,7 @@ export default ({
           <Flex>
             <Image src={logo} h="2rem"/>
             <Text ml={3} fontFamily="Crimson Text" fontSize={35}>
-              MetaFactory Wearables NFT Manager{title ? `: ${title}` : ''}
+              Wearables NFT Manager{title ? `: ${title}` : ''}
             </Text>
           </Flex>
         </Link>
@@ -156,7 +156,7 @@ export default ({
         <Spacer grow={1}/>
         <Flex mt={[5, '-1rem']} ml={1.5}>
           <Flex>
-            <Button onClick={toggleColorMode} fontSize={25} mx={1}>
+            <Button onClick={toggleColorMode} mx={1} p={0}>
               {colorMode !== 'light' ? '🔆' : '🌛'}
             </Button>
             {address && (

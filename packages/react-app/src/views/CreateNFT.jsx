@@ -36,7 +36,7 @@ export default ({
   }
 
   return (
-    <Container as="form" onSubmit={create}>
+    <Container as="form" onSubmit={create} mt={10}>
       <FormControl isRequired>
         <FormLabel>Quantity:</FormLabel>
         <Input

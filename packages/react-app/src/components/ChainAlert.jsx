@@ -9,12 +9,17 @@ export default ({ NETWORK, selectedChainId, localChainId, ...props }) => {
   if(!show) return null
 
   return (
-    <Alert status="error" maxW="20em" flexDirection="column" {...props}>
+    <Alert
+      status="error" maxW={80} bg="red.600"
+      flexDirection="column" {...props}
+    >
       <AlertIcon />
       <AlertTitle>Wrong Network</AlertTitle>
       <AlertDescription align="center">
-        You have <b>{NETWORK(selectedChainId)?.name ?? 'Unknown'}</b>{' '}
-        selected and you need to be on <b>{NETWORK(localChainId).name}</b>.
+        You have{' '}
+        <b>{NETWORK(selectedChainId)?.name ?? 'Unknown'}</b>
+        {' '}selected and you need to be on{' '}
+        <b>{NETWORK(localChainId).name}</b>.
       </AlertDescription>
       <CloseButton
         position="absolute" right={2} top={2}
