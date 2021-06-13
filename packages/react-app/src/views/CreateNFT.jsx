@@ -13,7 +13,7 @@ export default ({
   // ToDo: Fix this. The value is initially unset & later values are
   // ignored as a default value
   useEffect(() => {
-    if(treasurerParam && !treasurer) {
+    if (treasurerParam && !treasurer) {
       setTreasurer(treasurerParam)
     }
   }, [treasurerParam, treasurer])
@@ -23,15 +23,17 @@ export default ({
     const enact = (
       window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
     )
-    if(enact) {
+    if (enact) {
       await contract.mint(treasurer, quantity, metadata, [])
       history.push('/')
     }
   }
 
-  if(!contract) {
+  if (!contract) {
     return (
-      <Container align="center">¡Missing Contract!</Container>
+      <Container align="center" mt={10}>
+        ¡Missing Contract! ¿Are you connected?
+      </Container>
     )
   }
 

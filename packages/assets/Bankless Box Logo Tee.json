@@ -1,0 +1,33 @@
+{
+  "name": "Bankless Box Logo Tee",
+  "description": "Remember April Fools, 2021? The Bank + Bankless collaboration is the most iconic team-up that will never be.\n\n---\n\nBreakups are usually hard. Will you ever be loved the same way? Can I really be sure that it's not my fault after all? We've all been through it one way or another before. It is always a tough call. But not this one. If you're worth your salt and know your shit (which, if you're buying with us, we know you do), go ahead boo - break up with your bank and go wild. You don't need one when all of Ethereum's got your back. Raise a glass to a better, bolder, Bankless version of you. 😘\n\nWE WILL NEVER PRINT THIS AGAIN.\n\n* Total Supply: Timed edition of 48 hours. Closes at 11:59PM PST on May 18th, 2021.",
+  "image": "ipfs://QmSMXNhgxK5r6zNMcKU2FntuzUr3wrDxuczjphuawAq9Ki",
+  "decimals": 0,
+  "external_url": "https://dysbulic.github.io/nft-wearable/#/view/2",
+  "animation_url": "ipfs://QmbiCyd5KmQuzgH7u4yjsAWg5oXhXvgqdyZw17UubfNQzL/Bankless%20Box%20Logo%20Tee.glb",
+  "background_color": "FFB9B9",
+  "properties": {
+    "wearables": {
+      "model/gltf-binary": "ipfs://QmbiCyd5KmQuzgH7u4yjsAWg5oXhXvgqdyZw17UubfNQzL/Bankless%20Box%20Logo%20Tee.glb"
+    },
+    "Quantity": "open"
+  },
+  "attributes": [
+    {
+      "display_type": "date",
+      "trait_type": "Drop Date", 
+      "value": 1546360800
+    },
+    {
+      "display_type": "boost_percentage",
+      "trait_type": "Freshness", 
+      "value": 90
+    },
+    {
+      "display_type": "boost_number",
+      "value": 10,
+      "max_value": 20,
+      "trait_type": "Snark"
+    }
+  ]
+}

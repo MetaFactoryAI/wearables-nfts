@@ -10,6 +10,8 @@ import "openzeppelin-solidity/contracts/token/ERC1155/ERC1155.sol";
 contract WearablesNFTs is ERC1155 {
   mapping (uint256 => string) private _uris;
   uint256 _tokenCount = 0;
+  string public name = "MetaFactory Wearables";
+  string public symbol = "MF";
 
   constructor() ERC1155("Single Metadata URI Is Not Used") {
   }

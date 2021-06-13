@@ -2,7 +2,8 @@ import React, { useEffect , useState} from 'react'
 import {
   Alert, AlertIcon, Spinner, Button, Tooltip,
   Table, Thead, Tbody, Tr, Th, Td, useDisclosure,
-  Box, Image, Flex, Heading, useToast, useBreakpointValue, useColorMode,
+  Box, Image, Flex, Heading, useToast,
+  useBreakpointValue, useColorMode,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
 import { useParams } from 'react-router'
@@ -40,6 +41,7 @@ export default ({
   const addrSize = (
     useBreakpointValue(['shortest', 'medium'])
   )
+  const threeCol = useBreakpointValue([false, true])
 
   let id = params.id?.toLowerCase()
   if(!id.includes('-')) {
@@ -141,30 +143,41 @@ export default ({
           bg={colorMode === 'dark' ? 'gray.800' : 'white'}
         >
           <Tr>
-            <Th textAlign="center">
-              Quantity {total && `(${total})`}
-            </Th>
-            <Th>Owner</Th>
+            {threeCol ? (
+              <>
+                <Th textAlign="center">
+                  Quantity {total && `(${total})`}
+                </Th>
+                <Th>Owner</Th>
+              </>
+            ) : (
+              <Th>Owner {total && `(${total})`}</Th>
+            )}
             <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
           {Object.entries(balances).map(([account, amount]) => (
             <Tr key={account}>
-              <Td>{amount}</Td>
-              <Td><Address
-                value={account} size={addrSize}
-                {...{ ensProvider }}
-              /></Td>
+              {threeCol && <Td>{amount}</Td>}
+              <Td>
+                {threeCol || `(${amount})`}
+                <Address
+                  value={account} size={addrSize}
+                  {...{ ensProvider }}
+                />
+              </Td>
               <Td>
                 {account?.localeCompare(
                   address, undefined, { sensitivity: 'base' }
                 ) === 0 && (
-                  <Button onClick={config}>
-                    <span role="img" aria-label="Distribute">
-                      ⛲
-                    </span>
-                  </Button>
+                  <Tooltip hasArrow label="Distribute">
+                    <Button onClick={config}>
+                      <span role="img" aria-label="Distribute">
+                        ⛲
+                      </span>
+                    </Button>
+                  </Tooltip>
                 )}
               </Td>
             </Tr>

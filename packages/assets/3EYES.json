@@ -1,0 +1,15 @@
+{
+  "name": "“3EYES” Tee",
+  "description": "Nothing escapes the third eye of truth! Pledge your allegiance and have your sight blessed with purity of collaborative intention. The first merch drop from MetaGame!\n\n* 300 available\n* 100% Supima cotton\n* Regular fit\n* Made in California",
+  "image": "ipfs://QmUsf1rPUwLc1aeKQTeJDXRDLZrMA2a7vngwTpmPbQtQGg",
+  "decimals": 0,
+  "external_url": "https://dysbulic.github.io/nft-wearable/#/view/1",
+  "animation_url": "ipfs://QmSP9VeES3wk5NoVgSFpi8DoHooxQopkmZmSo3tSTN7CHA/3eyes.glb",
+  "background_color": "43048F",
+  "properties": {
+    "wearables": {
+      "model/fbx": "ipfs://QmcqMCitAQ2dadLoci3WvLqzRGKFfn8FVzNzcfw7UdSjTA?filename=3eyes.fbx",
+      "model/gltf-binary": "ipfs://QmSP9VeES3wk5NoVgSFpi8DoHooxQopkmZmSo3tSTN7CHA/3eyes.glb"
+    }
+  }
+}

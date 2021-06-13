@@ -31,7 +31,7 @@ localProviderUrl = (
 const localProvider = new StaticJsonRpcProvider(localProviderUrl)
 const blockExplorer = targetNetwork.blockExplorer
 
-export default (props) => {
+export default () => {
   const [injectedProvider, setInjectedProvider] = useState()
   const address = useUserAddress(injectedProvider)
   const writeContracts = useContractLoader(injectedProvider)

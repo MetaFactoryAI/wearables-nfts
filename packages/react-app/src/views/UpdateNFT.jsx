@@ -125,10 +125,10 @@ export default ({ contract, validNetwork }) => {
               let msg = ((metadata === null) ? (
                 "Metadata is corrupt."
               ) : (
-                "Metadata override specified."
+                "Metadata override requested."
               ))
               return `${msg} Provide a replacement.`
-            })}
+            })()}
           />
         </FormControl>
         <Button

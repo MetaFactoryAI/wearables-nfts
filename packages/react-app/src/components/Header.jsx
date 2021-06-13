@@ -20,7 +20,7 @@ let NetworkMismatch = ({
     return (
       <ChainAlert
         {...{ NETWORK, selectedChainId, localChainId }}
-        position="absolute" top={3} right={3} zIndex={2}
+        position="absolute" top={3} right={0} zIndex={2}
       />
     )
   }
@@ -171,7 +171,7 @@ export default ({
           </Flex>
           <Stack mr={5}>
             <ConnectionButton {...{
-              web3Modal, logoutOfWeb3Modal, loadWeb3Modal,
+              web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
             }}/>
             <NetworkDisplay {...{
               injectedProvider, NETWORK, selectedChainId,
@@ -179,7 +179,7 @@ export default ({
           </Stack>
         </Flex>
         <NetworkMismatch {...{
-          localChainId, selectedChainId, NETWORK,
+          localChainId, NETWORK, selectedChainId,
         }}/>
       </Flex>
     </chakra.header>
