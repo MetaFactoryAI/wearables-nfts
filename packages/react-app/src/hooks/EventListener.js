@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
 
 export default ({
   contracts, name, event, provider, startBlock,
@@ -21,7 +21,7 @@ export default ({
         return () => {
           contracts[name].removeListener(event)
         }
-      } catch (e) {
+      } catch(e) {
         console.error(e)
       }
     }

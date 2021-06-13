@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { isAddress } from "@ethersproject/address";
+import { useEffect, useState } from 'react'
+import { isAddress } from '@ethersproject/address'
 
 /*
   ~ What it does? ~
@@ -16,7 +16,7 @@ import { isAddress } from "@ethersproject/address";
   - Change provider to check contract address on different chains (ex. mainnetProvider)
 */
 
-const useContractExistsAtAddress = (provider, contractAddress) => {
+export default (provider, contractAddress) => {
   const [contractIsDeployed, setContractIsDeployed] = useState(false);
 
   // We can look at the blockchain and see what's stored at `contractAddress`
@@ -25,14 +25,12 @@ const useContractExistsAtAddress = (provider, contractAddress) => {
   useEffect(() => {
     // eslint-disable-next-line consistent-return
     const checkDeployment = async () => {
-      if (!isAddress(contractAddress)) return false;
-      const bytecode = await provider.getCode(contractAddress);
-      setContractIsDeployed(bytecode !== "0x0");
+      if(!isAddress(contractAddress)) return false
+      const bytecode = await provider.getCode(contractAddress)
+      setContractIsDeployed(bytecode !== '0x0')
     };
-    if (provider) checkDeployment();
-  }, [provider, contractAddress]);
+    if(provider) checkDeployment()
+  }, [provider, contractAddress])
 
-  return contractIsDeployed;
-};
-
-export default useContractExistsAtAddress;
+  return contractIsDeployed
+}

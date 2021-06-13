@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { AddressZero } from "@ethersproject/constants";
+import { useState, useEffect } from 'react'
+import { AddressZero } from '@ethersproject/constants'
 
 /*
   ~ What it does? ~
@@ -16,16 +16,15 @@ import { AddressZero } from "@ethersproject/constants";
   - Provide ENS name and get address corresponding to given ENS name
 */
 
-const useResolveName = (provider, ensName) => {
+export default (provider, ensName) => {
   const [address, setAddress] = useState(AddressZero);
 
   useEffect(() => {
     if (provider) {
-      provider.resolveName(ensName).then((resolvedAddress) => setAddress(resolvedAddress));
+      provider.resolveName(ensName)
+      .then((addr) => setAddress(addr))
     }
-  }, [provider, ensName]);
+  }, [provider, ensName])
 
-  return address;
-};
-
-export default useResolveName;
+  return address
+}

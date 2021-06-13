@@ -35,8 +35,8 @@ const useUserProvider = (injectedProvider, localProvider) => (
       if(window.location.pathname.indexOf("/pk") >= 0) {
         let incomingPK = window.location.hash.replace("#","")
         let rawPK
-        if(incomingPK.length===64 || incomingPK.length===66) {
-          console.log("🔑 Incoming Private Key...")
+        if(incomingPK.length === 64 || incomingPK.length === 66) {
+          console.log("🔑 Incoming Private Key…")
           rawPK = incomingPK
           burnerConfig.privateKey = rawPK
           window.history.pushState({}, "", "/")

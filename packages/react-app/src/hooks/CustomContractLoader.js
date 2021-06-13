@@ -1,7 +1,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-import { Contract } from "@ethersproject/contracts";
-import { useState, useEffect } from "react";
+import { Contract } from '@ethersproject/contracts'
+import { useState, useEffect } from 'react'
 
 /*
   when you want to load a local contract's abi but supply a custom address
@@ -23,35 +23,42 @@ import { useState, useEffect } from "react";
   - Specify the customAddress of your contract
 */
 
-export default function useCustomContractLoader(provider, contractName, address) {
+export default (provider, contractName, address) => {
   const [contract, setContract] = useState();
   useEffect(() => {
-    async function loadContract() {
-      if (typeof provider !== "undefined" && contractName && address) {
+    const loadContract = async () => {
+      if(provider !== undefined && contractName && address) {
         try {
           // we need to check to see if this provider has a signer or not
-          let signer;
+          let signer
           const accounts = await provider.listAccounts();
           if (accounts && accounts.length > 0) {
-            signer = provider.getSigner();
+            signer = provider.getSigner()
           } else {
-            signer = provider;
+            signer = provider
           }
 
-          const customContract = new Contract(address, require(`../contracts/${contractName}.abi.js`), signer);
+          const customContract = new Contract(
+            address,
+            require(`../contracts/${contractName}.abi.js`),
+            signer
+          )
           try {
-            customContract.bytecode = require(`../contracts/${contractName}.bytecode.js`);
-          } catch (e) {
-            console.log(e);
+            customContract.bytecode = (
+              require(`../contracts/${contractName}.bytecode.js`)
+            )
+          } catch(e) {
+            console.error(e);
           }
 
           setContract(customContract);
-        } catch (e) {
-          console.log("ERROR LOADING CONTRACTS!!", e);
+        } catch(e) {
+          console.error("ERROR LOADING CONTRACTS!!", e)
         }
       }
     }
-    loadContract();
-  }, [provider, contractName, address]);
-  return contract;
+    loadContract()
+  }, [provider, contractName, address])
+
+  return contract
 }
