@@ -1,4 +1,4 @@
-import React, { useEffect , useState} from 'react'
+import React, { useCallback, useEffect , useState} from 'react'
 import {
   Alert, AlertIcon, Spinner, Button, Tooltip,
   Table, Thead, Tbody, Tr, Th, Td, useDisclosure,
@@ -27,11 +27,11 @@ const TOKEN = gql(`
 `)
 
 export default ({
-  ensProvider, address, contract, validNetwork,
+  ensProvider, address, contract, desiredNetwork,
 }) => {
   const [balances, setBalances] = useState(null)
   const [quantity, setQuantity] = useState(null)
-  const [tokenID, setTokenID] = useState(null)
+  const [tokenId, setTokenId] = useState(null)
   const [total, setTotal] = useState(null)
   const [meta, setMeta] = useState(<Spinner/>)
   const { colorMode }= useColorMode()
@@ -53,10 +53,10 @@ export default ({
     TOKEN, { variables: { id } },
   )
   const config = () => {
-    if(!validNetwork) {
+    if(desiredNetwork) {
       toast({
         title: 'Connection Error',
-        description: 'Connect to the correct network to distribute.',
+        description: `Connect to the ${desiredNetwork} network to distribute.`,
         status: 'error',
         duration: 7000,
         isClosable: true,
@@ -66,13 +66,18 @@ export default ({
       onOpen()
     }
   }
-  const distribute = async (recipients) => {
+  const distribute = useCallback(async (recipients) => {
     try {
+      recipients = await Promise.all(
+        recipients.map(async (r) => (
+          await ensProvider.resolveName(r)
+        ))
+      )
       await contract.distributeSingles(
-        address, recipients, tokenID, []
+        address, recipients, tokenId, []
       )
     } catch(err) {
-      const cause = err.error
+      const cause = err.error ?? err
       console.error('Error Distributing', err)
       toast({
         title: "Couldn't Distribute",
@@ -83,7 +88,7 @@ export default ({
       })
       throw cause
     }
-  }
+  }, [ensProvider, contract, tokenId])
 
   useEffect(() => {
     if(data?.token) {
@@ -98,7 +103,7 @@ export default ({
       )
       setBalances(quantities)
       setTotal(totalSupply)
-      setTokenID(identifier)
+      setTokenId(identifier)
 
       fetch(httpURL(URI))
       .then(res => res.json())

@@ -132,14 +132,20 @@ export default ({ action = null }) => {
                   href={token.image}
                   target="_blank" rel="noopener noreferrer"
                 >
-                  <Image maxH="5rem" m="auto" src={token.image}/>
+                  <Image maxH={20} m="auto" src={token.image}/>
                 </a>
                 ?? <em>No Image</em>
               )}</Td>
               <Td display={['none', 'table-cell']}>
                 {token.loading ? <Spinner/> : (
                   token.description ? (
-                    `${token.description.split('.')[0]}…`
+                    `${
+                      token.description.substring(0, 30)
+                    }${
+                      token.description.substring(30).split(' ')[0]
+                    }${
+                      token.description.length > 30 ? '…' : ''
+                    }`
                   ) : (
                     <em>No Description</em>
                   )
@@ -150,7 +156,7 @@ export default ({ action = null }) => {
               </Td>
               <Td display={['none', 'table-cell']}>
                 <a href={token.metadata}>
-                  <ExternalLinkIcon/>
+                  <Button><ExternalLinkIcon/></Button>
                 </a>
               </Td>
               {!action && (

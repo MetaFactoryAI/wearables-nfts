@@ -4,23 +4,18 @@ import { useParams } from 'react-router-dom'
 import UpdateNFT from './UpdateNFT'
 import ExistingNFTs from './ExistingNFTs'
 
-export default ({ contract, validNetwork }) => {
+export default (props) => {
   const params = useParams()
 
   if(params.id) {
-    return (
-      <UpdateNFT
-        {...{ contract, validNetwork }}
-      />
-    )
-  } else {
-    return (
-      <>
-        <Heading align="center" m={8}>
-          Select Which NFT To Edit
-        </Heading>
-        <ExistingNFTs action="edit"/>
-      </>
-    )
+    return <UpdateNFT {...props}/>
   }
+  return (
+    <>
+      <Heading align="center" m={8}>
+        Select A NFT To Edit
+      </Heading>
+      <ExistingNFTs action="edit"/>
+    </>
+  )
 }

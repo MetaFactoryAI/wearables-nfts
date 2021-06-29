@@ -3,18 +3,32 @@
   "description": "Instant, sublime, radiant, transformative thoughts run through a Robot's mind while he rolls it up and packs it tight. No matter how you slice it - a good day is a day spent swapping yourself silly. What? No. It's not nonsense. It's $SUSHI, sweety. You can't have just one.\n\nThe SUSHI.02 Hoodie is cut from a premium cotton / fleece blend for that ultra-comfy feel. Relaxed Fit.\n\n* Designed by [wloka](https://twitter.com/0xWloka) and [METADREAMER](https://twitter.com/META_DREAMER)\n* Limited to 150 units\n* Made in California",
   "image": "ipfs://QmZzxsNTxhzaduHr294EH26ZyUgm7YN8GJWg4pzs9CSdVu",
   "decimals": 0,
-  "external_url": "https://dysbulic.github.io/nft-wearable/#/view/2",
-  "animation_url": "ipfs://Qmag8bZHZcjkpY9FSYjYoeJWj7DCv86Vr1WicbSxr1RiWV/SUSHI.02.glb",
+  "external_url": "https://dysbulic.github.io/nft-wearable/#/view/3",
+  "animation_url": "ipfs://QmdS7TzzHLkGDa917oMz8682D8zCB6wbAM4cZj63ZBqdV1/SUSHI.02.glb",
   "background_color": "CFD4FF",
   "properties": {
     "wearables": {
-      "model/gltf-binary": "ipfs://Qmag8bZHZcjkpY9FSYjYoeJWj7DCv86Vr1WicbSxr1RiWV/SUSHI.02.glb"
+      "model/gltf-binary": "ipfs://QmdS7TzzHLkGDa917oMz8682D8zCB6wbAM4cZj63ZBqdV1/SUSHI.02.glb"
     },
     "Designers": "wloka & METADREAMER",
-    "Quantity": "150",
-    "Drop Date": {
-      "display_type": "date", 
+    "Quantity": "150"
+  },
+  "attributes": [
+    {
+      "display_type": "date",
+      "trait_type": "Drop Date", 
       "value": 1546360800
+    },
+    {
+      "display_type": "boost_percentage",
+      "trait_type": "Style", 
+      "value": 93
+    },
+    {
+      "display_type": "boost_number",
+      "value": 8,
+      "max_value": 10,
+      "trait_type": "Schmick"
     }
-  }
+  ]
 }

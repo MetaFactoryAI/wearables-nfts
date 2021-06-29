@@ -1,20 +1,15 @@
 import {
-  chakra, Button, Spinner, FormControl, Container, Input,
-  FormLabel, UnorderedList, ListItem, Box, Image, Tooltip,
-  Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex,
-  Alert, AlertIcon, IconButton, Text, useBreakpointValue,
-  ButtonGroup,
+  Button, Spinner, FormControl, Container, Input,
+  FormLabel, Box, Alert, AlertIcon,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import ReactMarkdown from 'react-markdown'
 import { useLocation } from 'react-router-dom'
-import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { SaveOutlined } from '@ant-design/icons'
 import contractAddress from '../contracts/WearablesNFTs.address'
 import { httpURL } from '../helpers'
 import EditOrList from './EditOrList'
+import NFTForm from '../components/NFTForm'
 
 const TOKEN = gql(`
   query GetToken($id: String!) {
@@ -29,21 +24,11 @@ const useQueryParams = () => (
   new URLSearchParams(useLocation().search)
 )
 
-export default ({ contract, validNetwork }) => {
+export default ({ contract, desiredNetwork }) => {
   const [metadata, setMetadata] = useState()
   const [newMetadata, setNewMetadata] = useState('')
   const [tokenId, setTokenId] = useState()
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [homepage, setHomepage] = useState('')
-  const [wearables, setWearables] = useState({})
   const query = useQueryParams()
-  const saveLabel = useBreakpointValue(['Save', ''])
-  
-  const [hide, setHide] = useState({})
-  const toggle = useCallback((prop) => {
-    setHide(h => ({ ...h, [prop]: !h[prop] }))
-  }, [])
 
   const params = useParams()
   let id = params.id?.toLowerCase()
@@ -66,10 +51,6 @@ export default ({ contract, validNetwork }) => {
           try {
             const metadata = await res.json()
             setMetadata(metadata)
-            setName(metadata.name ?? '')
-            setDescription(metadata.description ?? '')
-            setHomepage(metadata.external_url ?? '')
-            setWearables(metadata.properties?.wearables ?? {})
           } catch(err) { // invalid JSON
             setMetadata(null)
           }
@@ -82,7 +63,7 @@ export default ({ contract, validNetwork }) => {
 
   if(id === undefined) {
     return (
-      <EditOrList {...{ contract, validNetwork }}/>
+      <EditOrList {...{ contract, desiredNetwork }}/>
     )
   }
 
@@ -132,9 +113,9 @@ export default ({ contract, validNetwork }) => {
           />
         </FormControl>
         <Button
-          type="submit" isDisabled={!validNetwork} mt={5}
-          title={validNetwork ? 'Replace Metadata' : (
-            'Connect to the correct network.'
+          type="submit" isDisabled={!desiredNetwork} mt={5}
+          title={desiredNetwork ? 'Replace Metadata' : (
+            `Connect to the ${desiredNetwork} network.`
           )}
         >
           Overwrite Metadata
@@ -143,114 +124,10 @@ export default ({ contract, validNetwork }) => {
     )
   }
 
-  const save = () => {
-    console.info("Saving…")
-  }
-
   return (
-    <Flex
-      direction={['column-reverse', 'row-reverse']}
-      align="center" justify="center" mt={10}
-    >
-      <Tooltip hasArrow placement="top" label="Save">
-        <ButtonGroup
-          isAttached variant="outline" mt={5} onClick={save}
-        >
-          <IconButton
-            aria-label="Save" title="Save" icon={<SaveOutlined/>}
-          />
-          {saveLabel && <Button>{saveLabel}</Button>}
-        </ButtonGroup>
-      </Tooltip>
-      <Container m={0} sx={{ a: { textDecoration: 'underline' } }}>
-        <UnorderedList>
-          <ListItem listStyleType="square">
-            <FormControl>
-              <Flex align="center">
-                <FormLabel>Name:</FormLabel>
-                <Input
-                  value={name}
-                  onChange={evt => setName(evt.target.value)}
-                />
-              </Flex>
-            </FormControl>
-          </ListItem>
-          <ListItem
-            listStyleType={
-              `disclosure-${hide['desc'] ? 'closed' : 'open'}`
-            }
-          >
-            <Text onClick={() => toggle('desc')}>
-              Description:
-            </Text>
-            {!hide['desc'] && (
-              <Tabs ml={5} isFitted variant="enclosed"  minH="15em">
-                <TabList mb="1em">
-                  <Tab>Markdown</Tab>
-                  <Tab>Preview</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <Textarea
-                      placeholder="Enter a markdown formatted description."
-                      value={description} minH="8em"
-                      onChange={evt => setDescription(evt.target.value)}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <ReactMarkdown>
-                      {description}
-                    </ReactMarkdown>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            )}
-          </ListItem>
-          <ListItem listStyleType="square">
-            <FormControl>
-              <Flex align="center">
-                <FormLabel>Homepage:</FormLabel>
-                <Input
-                  value={homepage}
-                  onChange={evt => setHomepage(evt.target.value)}
-                />
-                {homepage.length > 0 && (
-                  <chakra.a ml={3} href={homepage} target="_blank">
-                    <ExternalLinkIcon/>
-                  </chakra.a>
-                )}
-              </Flex>
-            </FormControl>
-          </ListItem>
-          <ListItem
-            listStyleType={
-              `disclosure-${hide['img'] ? 'closed' : 'open'}`
-            }
-          >
-            <Text onClick={() => toggle('img')}>
-              Image:
-            </Text>
-            {!hide['img'] && (
-              <Image src={httpURL(metadata.image)} maxH={60}/>
-            )}
-          </ListItem>
-          <ListItem>Models:{' '}
-            {Object.keys(wearables).length === 0 ? (
-              <em>None</em>
-            ) : (
-              <UnorderedList>
-                {Object.entries(wearables).map(
-                  ([mimetype, model]) => (
-                    <ListItem>
-                      <a href={httpURL(model)}>{mimetype}</a>
-                    </ListItem>
-                  )
-                )}
-              </UnorderedList>
-            )}
-          </ListItem>
-        </UnorderedList>
-      </Container>
-    </Flex>
+    <NFTForm
+      purpose="update" {...metadata}
+      {...{ contract, desiredNetwork }}
+    />
   )
 }

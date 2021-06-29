@@ -53,6 +53,7 @@
     "framer-motion": "^4",
     "graphiql": "^1.0.5",
     "graphql": "^15.5.0",
+    "ipfs-http-client": "^50.1.2",
     "isomorphic-fetch": "^3.0.0",
     "node-watch": "^0.7.1",
     "postcss": "^8.2.6",

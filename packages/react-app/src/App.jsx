@@ -17,8 +17,9 @@ import CreateNFT from './views/CreateNFT'
 import DisburseOrList from './views/DisburseOrList'
 import EditOrList from './views/EditOrList'
 import ViewOrList from './views/ViewOrList'
+import { capitalize } from './helpers'
 
-const targetNetwork = NETWORKS['rinkeby'] // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS['rinkeby']
 const mainnetInfura = (
   new StaticJsonRpcProvider(`https://mainnet.infura.io/v3/${INFURA_ID}`)
 )
@@ -35,13 +36,21 @@ export default () => {
   const [injectedProvider, setInjectedProvider] = useState()
   const address = useUserAddress(injectedProvider)
   const writeContracts = useContractLoader(injectedProvider)
-  const [validNetwork, setValidNetwork] = useState(false)
+  const [desiredNetwork, setDesiredNetwork] = (
+    useState(targetNetwork.name)
+  )
 
   useEffect(() => {
     (async () => {
       if(injectedProvider) {
         const chainId = (await injectedProvider.getNetwork()).chainId
-        setValidNetwork(chainId === targetNetwork.chainId)
+        setDesiredNetwork(
+          chainId !== targetNetwork.chainId ? (
+            capitalize(targetNetwork.name)
+          ) : (
+            null
+          )
+        )
       }
     })()
   }, [injectedProvider])
@@ -61,7 +70,7 @@ export default () => {
     <Box className="App">
       <Router>
         <Header
-          minH="4em" pl={10} pt={5}
+          minH={16} pl={10} pt={5}
           {...{
             NETWORK,
             targetNetwork,
@@ -79,23 +88,23 @@ export default () => {
         <Switch>
           <Route path='/new'>
             <CreateNFT
-              {...{ validNetwork }}
+              {...{ desiredNetwork }}
               contract={writeContracts?.WearablesNFTs}
               treasurer={address}
             />
           </Route>
           <Route path='/edit/:id?'>
             <EditOrList
-              {...{ validNetwork }}
+              {...{ desiredNetwork }}
               contract={writeContracts?.WearablesNFTs}
             />
           </Route>
           <Route path='/view/:id?'>
-            <ViewOrList {...{ validNetwork }}/>
+            <ViewOrList {...{ desiredNetwork }}/>
           </Route>
           <Route path='/disburse/:id?'>
             <DisburseOrList
-              {...{ address, validNetwork }}
+              {...{ address, desiredNetwork }}
               ensProvider={mainnetProvider}
               contract={writeContracts?.WearablesNFTs}
             />

@@ -22,7 +22,6 @@ const config = {
   initialColorMode: 'dark',
 }
 
-
 const theme = extendTheme({ config })
   // styles: {
   //   global: {
@@ -33,8 +32,6 @@ const theme = extendTheme({ config })
   //   },
   // },
 // })
-
-console.info('ICM', theme.config.initialColorMode)
 
 ReactDOM.render(
   <ApolloProvider {...{ client }}>

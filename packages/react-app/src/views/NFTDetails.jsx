@@ -20,7 +20,7 @@ const TOKEN = gql(`
   }
 `)
 
-export default ({ contract, validNetwork }) => {
+export default (props) => {
   const [metadata, setMetadata] = useState()
   const [tokenId, setTokenId] = useState()
   const homepage = metadata?.external_url
@@ -44,8 +44,8 @@ export default ({ contract, validNetwork }) => {
     if(data) {
       if(!data.token) {
         let msg = `No data returned for the token ${id}.`
-        if(!validNetwork) {
-          msg += ' You are not connected to the right network…'
+        if(props.desiredNetwork) {
+          msg += ` You are not connected to the ${props.desiredNetwork} network…`
         }
         setError(msg)
       } else {
@@ -78,7 +78,7 @@ export default ({ contract, validNetwork }) => {
 
   if(id === undefined) {
     return (
-      <EditOrList {...{ contract, validNetwork }}/>
+      <EditOrList {...props}/>
     )
   }
 
@@ -119,7 +119,7 @@ export default ({ contract, validNetwork }) => {
         </ListItem>
         <ListItem>Homepage:{' '}
           {homepage ? (
-            <a href={homepage} target="_blank">
+            <a href={homepage} target="_blank" rel="noopener noreferrer">
               {homepage}
             </a>
           ) : <em>None</em>}
@@ -134,7 +134,7 @@ export default ({ contract, validNetwork }) => {
             <UnorderedList>
               {Object.entries(wearables).map(
                 ([mimetype, model]) => (
-                  <ListItem>
+                  <ListItem key={mimetype}>
                     <a href={httpURL(model)}>{mimetype}</a>
                   </ListItem>
                 )

@@ -1,35 +1,9 @@
-import { Container, FormControl, FormLabel, Input } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { Container } from '@chakra-ui/react'
+import React from 'react'
+import NFTForm from '../components/NFTForm'
 
-export default ({
-  contract, treasurer: treasurerParam, validNetwork
-}) => {
-  const [quantity, setQuantity] = useState(1)
-  const [treasurer, setTreasurer] = useState(treasurerParam)
-  const [metadata, setMetadata] = useState('')
-  const history = useHistory()
-
-  // ToDo: Fix this. The value is initially unset & later values are
-  // ignored as a default value
-  useEffect(() => {
-    if (treasurerParam && !treasurer) {
-      setTreasurer(treasurerParam)
-    }
-  }, [treasurerParam, treasurer])
-
-  const create = async (evt) => {
-    evt.preventDefault()
-    const enact = (
-      window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
-    )
-    if (enact) {
-      await contract.mint(treasurer, quantity, metadata, [])
-      history.push('/')
-    }
-  }
-
-  if (!contract) {
+export default (props) => {
+  if (!props.contract) {
     return (
       <Container align="center" mt={10}>
         ¡Missing Contract! ¿Are you connected?
@@ -38,43 +12,6 @@ export default ({
   }
 
   return (
-    <Container as="form" onSubmit={create} mt={10}>
-      <FormControl isRequired>
-        <FormLabel>Quantity:</FormLabel>
-        <Input
-          type="number"
-          value={quantity}
-          onChange={(evt) => {
-            const val = evt.target.value
-            setQuantity(val && parseInt(val))
-          }}
-          placeholder="¿How many tokens to mint?"
-        />
-      </FormControl>
-      <FormControl isRequired>
-        <FormLabel>Treasurer:</FormLabel>
-        <Input
-          type="text"
-          value={treasurer}
-          onChange={(evt) => setTreasurer(evt.target.value)}
-          placeholder="¿Who should receive the new tokens?"
-        />
-      </FormControl>
-      <FormControl isRequired>
-        <FormLabel>Metadata:</FormLabel>
-        <Input
-          value={metadata}
-          onChange={(evt) => setMetadata(evt.target.value)}
-          placeholder="ToDo: Automatically generate this…"
-        />
-      </FormControl>
-      <Input
-        mt={2} variant="filled" type="submit" value="Create"
-        title={
-          validNetwork ? 'Create NFTs' : 'Connect to the correct network.'
-        }
-        isDisabled={!validNetwork}
-      />
-    </Container>
+    <NFTForm purpose="create" {...props}/>
   )
 }
