@@ -7,7 +7,7 @@ import {
   useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useHistory, useParams, Link } from 'react-router-dom'
+import { useHistory, useParams, Link, useLocation } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { AddIcon, CloseIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { create as ipfsHttpClient } from 'ipfs-http-client'
@@ -62,7 +62,9 @@ const ModelModal = ({
                 <option value="model/vrm">VRM</option>
               </optgroup>
               <optgroup>
-                <option value="other" style={{ fontStyle: 'italic' }}>Other</option>
+                <option value="other" style={{ fontStyle: 'italic' }}>
+                  Other
+                </option>
               </optgroup>
             </Select>
             {type === 'other' && (
@@ -95,21 +97,65 @@ const ModelModal = ({
   )
 }
 
+const Anchor = ({ name, box }) => {
+  const anchor = name.toLowerCase().replace(/\s+/g, '-')
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const elem = box?.current
+    if(elem) {
+      const over = () => setVisible(true)
+      elem.addEventListener(
+        'mouseover', over
+      )
+      const out = () => setVisible(false)
+      elem.addEventListener(
+        'mouseout', out
+      )
+      return () => {
+        elem.removeEventListener(
+          'mouseover', over
+        )
+        elem.removeEventListener(
+          'mouseout', out
+        )
+      }
+    }
+  }, [box])
+
+  return (
+    <Link
+      id={anchor}
+      to={{ hash: `#${anchor}` }}
+      style={{
+        textDecoration: 'none',
+        visibility: visible ? 'visible' : 'hidden'
+      }}
+    >
+      <span role="img" aria-label="Link">🔗</span>
+    </Link>
+  )
+}
+
+const Label = ({ name, box }) => (
+  <Flex ml="-2.75em" mt={-1.5}>
+    <Anchor {...{ name, box }}/>
+    <Text ml={3} mr={2}>■</Text>
+    <FormLabel whiteSpace="pre">{name}:</FormLabel>
+  </Flex>
+)
+
 const ExpandShow = ({ name, button = null, children }) => {
   const [hide, setHide] = useState({})
   const toggle = useCallback((prop) => {
     setHide(h => ({ ...h, [prop]: !h[prop] }))
   }, [])
+  const box = useRef()
 
   return (
-    <Box>
-      <Flex ml="-2em" mt={3} align="center">
-        <Link
-          to={{ hash: `#${name.toLowerCase().replace(/\s+/g, '-')}` }}
-          textDecoration="none"
-        >
-          <span role="img" aria-label="Link">🔗</span>
-        </Link>
+    <Box ref={box}>
+      <Flex ml="-3em" mt={3} align="center">
+        <Anchor {...{ name, box }}/>
         <Text
           ml={3}
           cursor={hide[name] ? 'zoom-in' : 'zoom-out'}
@@ -118,7 +164,7 @@ const ExpandShow = ({ name, button = null, children }) => {
           {hide[name] ? '▸' : '▾'}
           {` ${name}:`}
         </Text>
-        {button}
+        {!hide[name] && button}
       </Flex>
       {!hide[name] && children}
     </Box>
@@ -147,6 +193,11 @@ export default ({
   const ipfs = ipfsHttpClient(ipfsURI)
   const history = useHistory()
   const params = useParams()
+  const location = useLocation()
+  const refs = Object.fromEntries(
+    ['quantity', 'treasurer', 'name', 'homepage', 'background']
+    .map((attr) => [attr, useRef()])
+  )
 
   useEffect(() => {
     Object.entries({
@@ -183,6 +234,19 @@ export default ({
     })())
   }, [contract, purpose, homepage])
 
+  useEffect(() => {
+    console.info(location.hash)
+    if(location.hash) {
+      const elem = document.getElementById(
+        location.hash.substring(1)
+      )
+      window.scroll({
+        top: elem.offsetTop - 120,
+        behavior: 'smooth',
+      })
+    }
+  }, [location])
+
   const configImage = ({ target: { files }}) => {
     if(files.length === 1) {
       setImage(files[0])
@@ -217,10 +281,13 @@ export default ({
   }
 
   const enact = useCallback(async (metadata) => {
-    console.info(metadata)
     if(purpose === 'create') {
       const enact = (
-        window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
+        window.confirm(
+          `¿Mint ${quantity} token${
+            quantity === 1 ? '' : 's'
+          } to ${treasurer}?`
+        )
       )
       if(enact) {
         const address = ensProvider.resolveName(treasurer)
@@ -285,11 +352,17 @@ export default ({
 
     if(attributes.length > 0) {
       metadata.attributes = (
-        attributes.map(({ name, value, type }) => ({
-          display_type: type,
-          trait_type: name, 
-          value,
-        }))
+        attributes.map(({ name, value, type }) => {
+          const attr = {
+            trait_type: name, 
+            value,
+          }
+          // including a string type causes nothing to render
+          if(type !== 'string') {
+            attr.display_type = type
+          }
+          return attr
+        })
       )
     }
 
@@ -303,7 +376,7 @@ export default ({
 
   useEffect(() => {
     setAttributes([
-      { name: 'Designer', value: '[dysbulic](//twitter.com/dysbulic)', type: 'string' },
+      { name: 'Designer', value: 'dysbulic', type: 'string' },
       { name: 'Drop Date', value: (new Date()).getTime(), type: 'date' },
       { name: 'Release Size', value: 23, type: 'number' },
     ])
@@ -311,15 +384,16 @@ export default ({
 
   return (
     <Container
-      as="form" onSubmit={submit} mt={10} maxW={['100%', 'min(85vw, 50em)']}
+      as="form" onSubmit={submit}
+      mt={10} maxW={['100%', 'min(85vw, 50em)']}
       sx={{ a: { textDecoration: 'underline' } }}
     >
-      <UnorderedList>
+      <UnorderedList listStyleType="none">
         {purpose === 'create' && (
-          <ListItem listStyleType="square">
+          <ListItem ref={refs.quantity}>
             <FormControl isRequired>
               <Flex align="center">
-                <FormLabel whiteSpace="pre">Quantity to Mint:</FormLabel>
+                <Label name="Quantity to Mint" box={refs.quantity}/>
                 <Input
                   type="number" autoFocus
                   value={quantity}
@@ -333,24 +407,26 @@ export default ({
           </ListItem>
         )}
         {purpose === 'create' && (
-          <ListItem listStyleType="square">
+          <ListItem ref={refs.treasurer}>
             <FormControl isRequired mt={3}>
               <Flex align="center">
-                <FormLabel>Treasurer:</FormLabel>
+                <Label name="Treasurer" box={refs.treasurer}/>
                 <Input
                   type="text"
                   value={treasurer}
-                  onChange={({ target: { value } }) => setTreasurer(value)}
+                  onChange={({ target: { value } }) => (
+                    setTreasurer(value)
+                  )}
                   placeholder="¿Who should receive the new tokens?"
                 />
               </Flex>
             </FormControl>
           </ListItem>
         )}
-        <ListItem listStyleType="square">
+        <ListItem ref={refs.name}>
           <FormControl mt={3}>
             <Flex align="center">
-              <FormLabel>Name:</FormLabel>
+              <Label name="Name" box={refs.name}/>
               <Input
                 value={name}
                 onChange={({ target: { value } }) => setName(value)}
@@ -358,7 +434,7 @@ export default ({
             </Flex>
           </FormControl>
         </ListItem>
-        <ListItem listStyleType="none">
+        <ListItem>
           <ExpandShow name="Description">
             <Tabs ml={5} isFitted variant="enclosed">
               <TabList mb="1em">
@@ -384,13 +460,15 @@ export default ({
             </Tabs>
           </ExpandShow>
         </ListItem>
-        <ListItem listStyleType="square">
+        <ListItem ref={refs.homepage}>
           <FormControl mt={3}>
             <Flex align="center">
-              <FormLabel>Homepage:</FormLabel>
+              <Label name="Homepage" box={refs.homepage}/>
               <Input
                 value={homepage}
-                onChange={({ target: { value } }) => setHomepage(value)}
+                onChange={({ target: { value } }) => (
+                  setHomepage(value)
+                )}
               />
               {homepage?.length > 0 && (
                 <chakra.a ml={2} href={homepage} target="_blank">
@@ -400,7 +478,7 @@ export default ({
             </Flex>
           </FormControl>
         </ListItem>
-        <ListItem listStyleType="none">
+        <ListItem>
           <ExpandShow name="Image">
             <Box m={3}>
               <Input
@@ -425,10 +503,10 @@ export default ({
             </Box>
           </ExpandShow>
         </ListItem>
-        <ListItem listStyleType="square">
+        <ListItem ref={refs.background}>
           <FormControl mt={3}>
             <Flex align="center">
-              <FormLabel whiteSpace="pre">Background Color:</FormLabel>
+              <Label name="Background Color" box={refs.background}/>
               <Input
                 type="color" value={color}
                 onChange={({ target: { value }}) => setColor(value)}
@@ -436,13 +514,15 @@ export default ({
             </Flex>
           </FormControl>
         </ListItem>
-        <ListItem listStyleType="none">
+        <ListItem>
           <ExpandShow name="Animation">
             <Box m={3}>
               {typeof animation === 'string' && (
                 <Flex>
                   <Text>
-                    {decodeURI(animation.replace(/^ipfs:\/\/[^/]+\//, ''))}
+                    {decodeURI(animation.replace(
+                      /^ipfs:\/\/[^/]+\//, ''
+                    ))}
                   </Text>
                   <chakra.a href={httpURL(animation)} ml={3} mb={5}>
                     <ExternalLinkIcon/>
@@ -452,13 +532,17 @@ export default ({
               {animation instanceof File && (
                 <Flex>
                   <Text>{animation.name}</Text>
-                  <chakra.a href={URL.createObjectURL(animation)} ml={3} mb={5}>
+                  <chakra.a
+                    href={URL.createObjectURL(animation)}
+                    target="_blank" ml={3} mb={5}
+                  >
                     <ExternalLinkIcon/>
                   </chakra.a>
                 </Flex>
               )}
               <Input
-                type="file" accept="model/gltf+json,model/gltf-binary,video/*,.gltf,.glb"
+                type="file"
+                accept="model/gltf+json,model/gltf-binary,video/*,.gltf,.glb"
                 onChange={configAnimation}
                 h="auto"
               />
@@ -472,56 +556,66 @@ export default ({
               <AddIcon/>
             </Button>}
           >
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Value</Th>
-                  <Th>Type</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {attributes.map(({ name, value, type }, idx) => (
-                  <Tr key={idx}>
-                    <Td>{name}</Td>
-                    <Td><ReactMarkdown>
-                      {type === 'date' ? (
-                        (new Date(value)).toLocaleDateString(
-                          undefined,
-                          {
-                            weekday: 'long', year: 'numeric',
-                            month: 'long', day: 'numeric',
-                          },
-                        )
-                      ) : (
-                        value?.toString() ?? null
-                      )}
-                    </ReactMarkdown></Td>
-                    <Td>
-                      <Select value={type} onChange={() => ''}>
-                        <option value="string">String</option>
-                        <option value="date">Date</option>
-                        <option value="number">Number</option>
-                        <option value="boost_percentage">Boost Percentage</option>
-                        <option value="boost_number">Boost Number</option>
-                      </Select>
-                    </Td>
-                    <Td><Tooltip label="Remove" hasArrow>
-                      <Button
-                        size="sm" ml={2}
-                        onClick={() => setAttributes((attrs) => ([
-                            // does this need to be a deep copy?
-                            ...attrs.slice(0, idx - 1),
-                            ...attrs.slice(idx, -1)
-                        ]))}
-                      >
-                        <CloseIcon/>
-                      </Button>
-                    </Tooltip></Td>
+            {attributes.length > 0 && (
+              <Table
+                sx={{ 'th, td': { textAlign: 'center' } }}
+              >
+                <Thead>
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th>Value</Th>
+                    <Th>Type</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {attributes.map(({ name, value, type }, idx) => (
+                    <Tr key={idx}>
+                      <Td>{name}</Td>
+                      <Td>{(() => {
+                        switch(type) {
+                        case 'date':
+                          return (
+                            (new Date(value)).toLocaleDateString(
+                              undefined,
+                              {
+                                weekday: 'long', year: 'numeric',
+                                month: 'long', day: 'numeric',
+                              },
+                            )
+                          )
+                        default:
+                          return value?.toString() ?? null
+                        }
+                      })()}</Td>
+                      <Td>
+                        <Select value={type} onChange={() => ''}>
+                          <option value="string">String</option>
+                          <option value="date">Date</option>
+                          <option value="number">Number</option>
+                          <option value="boost_percentage">
+                            Boost Percentage
+                          </option>
+                          <option value="boost_number">
+                            Boost Number
+                          </option>
+                        </Select>
+                      </Td>
+                      <Td><Tooltip label="Remove" hasArrow>
+                        <Button
+                          size="sm" ml={2}
+                          onClick={() => setAttributes((attrs) => ([
+                              ...attrs.slice(0, idx),
+                              ...attrs.slice(idx + 1)
+                          ]))}
+                        >
+                          <CloseIcon/>
+                        </Button>
+                      </Tooltip></Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            )}
           </ExpandShow>
         </ListItem>
         <ListItem>
@@ -553,7 +647,8 @@ export default ({
         </ListItem>
       </UnorderedList>
       <Input
-        mt={3} variant="filled" type="submit" value={capitalize(purpose)}
+        mt={3} variant="filled" type="submit"
+        value={capitalize(purpose)}
         title={
           !desiredNetwork ? `${capitalize(purpose)} NFT` : (
             `Connect to the ${desiredNetwork} network.`
