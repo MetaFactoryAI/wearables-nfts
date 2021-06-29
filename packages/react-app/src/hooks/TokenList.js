@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
 
 /*
   ~ What it does? ~
@@ -18,7 +18,7 @@ import { useState, useEffect } from "react";
 export default (tokenListUri, chainId) => {
   const [tokenList, setTokenList] = useState([])
   let _tokenListUri = (
-    tokenListUri || "https://gateway.ipfs.io/ipns/tokens.uniswap.org"
+    tokenListUri || 'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
   )
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default (tokenListUri, chainId) => {
       }
     }
     getTokenList()
-  },[tokenListUri])
+  }, [tokenListUri, chainId, _tokenListUri])
 
   return tokenList
 }

@@ -3,7 +3,9 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
-export default ({ NETWORK, selectedChainId, localChainId, ...props }) => {
+export default ({
+  NETWORK, selectedChainId, targetChainId, ...props
+}) => {
   const [show, setShow] = useState(true)
 
   if(!show) return null
@@ -19,7 +21,7 @@ export default ({ NETWORK, selectedChainId, localChainId, ...props }) => {
         You have{' '}
         <b>{NETWORK(selectedChainId)?.name ?? 'Unknown'}</b>
         {' '}selected and you need to be on{' '}
-        <b>{NETWORK(localChainId).name}</b>.
+        <b>{NETWORK(targetChainId).name}</b>.
       </AlertDescription>
       <CloseButton
         position="absolute" right={2} top={2}

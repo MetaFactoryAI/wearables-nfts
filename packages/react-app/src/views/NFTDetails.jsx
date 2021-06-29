@@ -74,7 +74,7 @@ export default (props) => {
         })()
       }
     }
-  }, [data])
+  }, [data, id, props.desiredNetwork, toast])
 
   if(id === undefined) {
     return (

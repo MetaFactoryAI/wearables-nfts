@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import usePoller from "./Poller";
-import useOnBlock from "./OnBlock";
-import { Provider } from "@ethersproject/providers";
+import { useState, useEffect } from 'react'
+import usePoller from './Poller'
+import useOnBlock from './OnBlock'
 
-const DEBUG = false;
+const DEBUG = false
 
 /*
   ~ What it does? ~
@@ -12,7 +11,7 @@ const DEBUG = false;
 
   ~ How can I use? ~
 
-  const purpose = useContractReader(readContracts,"YourContract", "purpose")
+  const purpose = useContractReader(readContracts,'YourContract', 'purpose')
 
   ~ Features ~
 
@@ -31,7 +30,7 @@ export default (
 
   if(pollTime) {
     adjustPollTime = pollTime
-  } else if(!pollTime && typeof args === "number") {
+  } else if(!pollTime && typeof args === 'number') {
     // it's okay to pass poll time as last argument without args for the call
     adjustPollTime = args
   }
@@ -46,11 +45,11 @@ export default (
   const updateValue = async () => {
     try {
       let newValue
-      if(DEBUG) console.log("CALLING ", contractName, functionName, "with args", args);
+      if(DEBUG) console.log('CALLING ', contractName, functionName, 'with args', args)
       if(args && args.length > 0) {
-        newValue = await contracts[contractName][functionName](...args);
+        newValue = await contracts[contractName][functionName](...args)
         if(DEBUG) {
-          console.log("contractName", contractName, "functionName", functionName, "args", args, "RESULT:", newValue);
+          console.log('contractName', contractName, 'functionName', functionName, 'args', args, 'RESULT:', newValue)
         }
       } else {
         newValue = await contracts[contractName][functionName]()
@@ -62,7 +61,7 @@ export default (
         setValue(newValue)
       }
     } catch(e) {
-      console.error(e);
+      console.error(e)
     }
   }
 

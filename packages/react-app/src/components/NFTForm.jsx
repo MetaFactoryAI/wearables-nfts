@@ -4,12 +4,12 @@ import {
   Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex,
   Text, ModalOverlay, ModalContent, ModalHeader,
   ModalCloseButton, ModalBody, Select, ModalFooter, Modal,
-  useDisclosure,
+  useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import { AddIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { AddIcon, CloseIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { create as ipfsHttpClient } from 'ipfs-http-client'
 import { httpURL, capitalize } from '../helpers'
 
@@ -95,7 +95,7 @@ const ModelModal = ({
   )
 }
 
-const ExpandShow = ({ name, children }) => {
+const ExpandShow = ({ name, button = null, children }) => {
   const [hide, setHide] = useState({})
   const toggle = useCallback((prop) => {
     setHide(h => ({ ...h, [prop]: !h[prop] }))
@@ -103,14 +103,23 @@ const ExpandShow = ({ name, children }) => {
 
   return (
     <Box>
-      <Text
-        ml="-1em" mt={3}
-        cursor={hide[name] ? 'zoom-in' : 'zoom-out'}
-        onClick={() => toggle(name)}
-      >
-        {hide[name] ? '▸' : '▾'}
-        {` ${name}:`}
-      </Text>
+      <Flex ml="-2em" mt={3} align="center">
+        <Link
+          to={{ hash: `#${name.toLowerCase().replace(/\s+/g, '-')}` }}
+          textDecoration="none"
+        >
+          <span role="img" aria-label="Link">🔗</span>
+        </Link>
+        <Text
+          ml={3}
+          cursor={hide[name] ? 'zoom-in' : 'zoom-out'}
+          onClick={() => toggle(name)}
+        >
+          {hide[name] ? '▸' : '▾'}
+          {` ${name}:`}
+        </Text>
+        {button}
+      </Flex>
       {!hide[name] && children}
     </Box>
   )
@@ -118,7 +127,7 @@ const ExpandShow = ({ name, children }) => {
 
 export default ({
   contract, purpose = 'create', onSubmit, desiredNetwork,
-  ...props
+  ensProvider, ...props
 }) => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -127,11 +136,12 @@ export default ({
   const imageRef = useRef()
   const [animation, setAnimation] = useState()
   const [wearables, setWearables] = useState({})
+  const [attributes, setAttributes] = useState([])
   const [color, setColor] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [treasurer, setTreasurer] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [ipfsURI, setIPFSURI] = useState(
+  const [ipfsURI] = useState(
     process.env.REACT_APP_IPFS_URI ?? '/ip4/127.0.0.1/tcp/5001'
   )
   const ipfs = ipfsHttpClient(ipfsURI)
@@ -191,6 +201,10 @@ export default ({
     evt.preventDefault()
   }
 
+  const addRow = () => {
+    setAttributes(attrs => [...attrs, {}])
+  }
+
   const ipfsify = async (fileOrURL) => {
     if(fileOrURL.startsWith?.('ipfs://')) return fileOrURL
 
@@ -209,17 +223,22 @@ export default ({
         window.confirm(`¿Mint ${quantity} token${quantity === 1 ? '' : 's'} to ${treasurer}?`)
       )
       if(enact) {
-        await contract.mint(treasurer, quantity, metadata, [])
+        const address = ensProvider.resolveName(treasurer)
+        await contract.mint(address, quantity, metadata, [])
         history.push('/')
       }
     } else if(purpose === 'update') {
       const [tokenId] = params.id.split('-').slice(-1)
-      console.info('Updating', tokenId)
       await contract.setURI(metadata, parseInt(tokenId, 16))
     }
-  }, [purpose, contract])
+  }, [
+    purpose, contract, quantity, history, params.id,
+    treasurer, ensProvider,
+  ])
 
-  const submit = async () => {
+  const submit = async (evt) => {
+    evt.preventDefault()
+
     const metadata = {
       name: name ?? 'Untitled', description, decimals: 0,
     }
@@ -248,29 +267,51 @@ export default ({
       metadata.background_color = color.substring(1)
     }
 
+    metadata.properties = {}
+
     if(Object.keys(wearables).length > 0) {
-      metadata.properties = { wearables: Object.fromEntries(
-        await Promise.all(
-          Object.entries(wearables).map(
-            async ([type, value]) => (
-              [type, await ipfsify(value)]
+      metadata.properties.wearables = (
+        Object.fromEntries(
+          await Promise.all(
+            Object.entries(wearables).map(
+              async ([type, value]) => (
+                [type, await ipfsify(value)]
+              )
             )
           )
         )
-      ) }
+      )
+    }
+
+    if(attributes.length > 0) {
+      metadata.attributes = (
+        attributes.map(({ name, value, type }) => ({
+          display_type: type,
+          trait_type: name, 
+          value,
+        }))
+      )
     }
 
     const dataURI = await ipfsify({
       name: `metadata.${(new Date()).toISOString()}.json`,
-      content: JSON.stringify(metadata),
+      content: JSON.stringify(metadata, null, '  '),
     })
 
     await enact(dataURI)
   }
 
+  useEffect(() => {
+    setAttributes([
+      { name: 'Designer', value: '[dysbulic](//twitter.com/dysbulic)', type: 'string' },
+      { name: 'Drop Date', value: (new Date()).getTime(), type: 'date' },
+      { name: 'Release Size', value: 23, type: 'number' },
+    ])
+  }, [])
+
   return (
     <Container
-      as="form" onSubmit={submit} mt={10} w="75vw"
+      as="form" onSubmit={submit} mt={10} maxW={['100%', 'min(85vw, 50em)']}
       sx={{ a: { textDecoration: 'underline' } }}
     >
       <UnorderedList>
@@ -278,12 +319,12 @@ export default ({
           <ListItem listStyleType="square">
             <FormControl isRequired>
               <Flex align="center">
-                <FormLabel whiteSpace="pre">Amount to Mint:</FormLabel>
+                <FormLabel whiteSpace="pre">Quantity to Mint:</FormLabel>
                 <Input
-                  type="number"
+                  type="number" autoFocus
                   value={quantity}
                   onChange={({ target: { value } }) => {
-                    setQuantity(value && parseInt(value))
+                    setQuantity(value ? parseInt(value, 10) : '')
                   }}
                   placeholder="¿How many tokens to mint?"
                 />
@@ -294,13 +335,15 @@ export default ({
         {purpose === 'create' && (
           <ListItem listStyleType="square">
             <FormControl isRequired mt={3}>
-              <FormLabel>Treasurer:</FormLabel>
-              <Input
-                type="text"
-                value={treasurer}
-                onChange={({ target: { value } }) => setTreasurer(value)}
-                placeholder="¿Who should receive the new tokens?"
-              />
+              <Flex align="center">
+                <FormLabel>Treasurer:</FormLabel>
+                <Input
+                  type="text"
+                  value={treasurer}
+                  onChange={({ target: { value } }) => setTreasurer(value)}
+                  placeholder="¿Who should receive the new tokens?"
+                />
+              </Flex>
             </FormControl>
           </ListItem>
         )}
@@ -422,8 +465,72 @@ export default ({
             </Box>
           </ExpandShow>
         </ListItem>
+        <ListItem id="attributes">
+          <ExpandShow
+            name="Attributes"
+            button={<Button ml={2} onClick={addRow} size="xs">
+              <AddIcon/>
+            </Button>}
+          >
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Name</Th>
+                  <Th>Value</Th>
+                  <Th>Type</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {attributes.map(({ name, value, type }, idx) => (
+                  <Tr key={idx}>
+                    <Td>{name}</Td>
+                    <Td><ReactMarkdown>
+                      {type === 'date' ? (
+                        (new Date(value)).toLocaleDateString(
+                          undefined,
+                          {
+                            weekday: 'long', year: 'numeric',
+                            month: 'long', day: 'numeric',
+                          },
+                        )
+                      ) : (
+                        value?.toString() ?? null
+                      )}
+                    </ReactMarkdown></Td>
+                    <Td>
+                      <Select value={type} onChange={() => ''}>
+                        <option value="string">String</option>
+                        <option value="date">Date</option>
+                        <option value="number">Number</option>
+                        <option value="boost_percentage">Boost Percentage</option>
+                        <option value="boost_number">Boost Number</option>
+                      </Select>
+                    </Td>
+                    <Td><Tooltip label="Remove" hasArrow>
+                      <Button
+                        size="sm" ml={2}
+                        onClick={() => setAttributes((attrs) => ([
+                            // does this need to be a deep copy?
+                            ...attrs.slice(0, idx - 1),
+                            ...attrs.slice(idx, -1)
+                        ]))}
+                      >
+                        <CloseIcon/>
+                      </Button>
+                    </Tooltip></Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </ExpandShow>
+        </ListItem>
         <ListItem>
-          <ExpandShow name="Models">
+          <ExpandShow
+            name="Models"
+            button={<Button ml={2} onClick={onOpen} size="xs">
+              <AddIcon/>
+            </Button>}
+          >
             {Object.keys(wearables).length === 0 ? (
               <em>None</em>
             ) : (
@@ -437,14 +544,11 @@ export default ({
                 )}
               </UnorderedList>
             )}
-            <Flex justify="center">
-              <ModelModal
-                {...{
-                  isOpen, onClose, setWearables,
-                }}
-              />
-              <Button onClick={onOpen}><AddIcon/></Button>
-            </Flex>
+            <ModelModal
+              {...{
+                isOpen, onClose, setWearables,
+              }}
+            />
           </ExpandShow>
         </ListItem>
       </UnorderedList>

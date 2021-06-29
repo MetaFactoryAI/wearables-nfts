@@ -9,7 +9,8 @@ import { Box } from '@chakra-ui/react'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { useUserAddress } from 'eth-hooks'
-import { useContractLoader } from './hooks'
+import { Helmet } from 'react-helmet'
+import { useContractLoader, useLookupAddress } from './hooks'
 import { Header } from './components'
 import { INFURA_ID, NETWORK, NETWORKS } from './constants'
 import ExistingNFTs from './views/ExistingNFTs'
@@ -25,20 +26,58 @@ const mainnetInfura = (
 )
 const mainnetProvider = mainnetInfura
 
-let localProviderUrl = targetNetwork.rpcUrl
-localProviderUrl = (
-  process.env.REACT_APP_PROVIDER ?? localProviderUrl
-)
-const localProvider = new StaticJsonRpcProvider(localProviderUrl)
+// let localProviderUrl = targetNetwork.rpcUrl
+// localProviderUrl = (
+//   process.env.REACT_APP_PROVIDER ?? localProviderUrl
+// )
+// const localProvider = new StaticJsonRpcProvider(localProviderUrl)
+
 const blockExplorer = targetNetwork.blockExplorer
+
+const web3Modal = new Web3Modal({
+  network: targetNetwork.name, // optional
+  cacheProvider: true,         // optional
+  providerOptions: {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: INFURA_ID,
+      },
+    },
+  },
+})
 
 export default () => {
   const [injectedProvider, setInjectedProvider] = useState()
   const address = useUserAddress(injectedProvider)
+  const ensName = useLookupAddress(mainnetProvider, address)
   const writeContracts = useContractLoader(injectedProvider)
   const [desiredNetwork, setDesiredNetwork] = (
     useState(targetNetwork.name)
   )
+
+  const loadWeb3Modal = useCallback(async () => {
+    const provider = await web3Modal.connect()
+    setInjectedProvider(new Web3Provider(provider))
+  }, [setInjectedProvider])
+
+  const logoutOfWeb3Modal = async () => {
+    await web3Modal.clearCachedProvider()
+    setInjectedProvider(null)
+  }
+
+  useEffect(() => {
+    window.ethereum.on('chainChanged', loadWeb3Modal)
+    window.ethereum.on('accountsChanged', loadWeb3Modal)
+    return () => {
+      window.ethereum.unsubscribe(
+        'chainChanged', loadWeb3Modal
+      )
+      window.ethereum.unsubscribe(
+        'accountsChanged', loadWeb3Modal
+      )
+    }
+  }, [loadWeb3Modal])
 
   useEffect(() => {
     (async () => {
@@ -55,11 +94,6 @@ export default () => {
     })()
   }, [injectedProvider])
 
-  const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect()
-    setInjectedProvider(new Web3Provider(provider))
-  }, [setInjectedProvider])
-
   useEffect(() => {
     if(web3Modal.cachedProvider) {
       loadWeb3Modal()
@@ -68,6 +102,9 @@ export default () => {
 
   return (
     <Box className="App">
+      <Helmet>
+        <title>MetaFactory Wearables</title>
+      </Helmet>
       <Router>
         <Header
           minH={16} pl={10} pt={5}
@@ -75,13 +112,13 @@ export default () => {
             NETWORK,
             targetNetwork,
             address,
-            localProvider,
             injectedProvider,
             mainnetProvider,
             web3Modal,
             loadWeb3Modal,
             logoutOfWeb3Modal,
             blockExplorer,
+            targetChainId: targetNetwork.chainId,
           }}
         />
 
@@ -90,7 +127,8 @@ export default () => {
             <CreateNFT
               {...{ desiredNetwork }}
               contract={writeContracts?.WearablesNFTs}
-              treasurer={address}
+              ensProvider={mainnetProvider}
+              treasurer={ensName}
             />
           </Route>
           <Route path='/edit/:id?'>
@@ -117,33 +155,3 @@ export default () => {
     </Box>
   )
 }
-
-const web3Modal = new Web3Modal({
-  network: targetNetwork.name, // optional
-  cacheProvider: true,         // optional
-  providerOptions: {
-    walletconnect: {
-      package: WalletConnectProvider, // required
-      options: {
-        infuraId: INFURA_ID,
-      },
-    },
-  },
-})
-
-const logoutOfWeb3Modal = async () => {
-  await web3Modal.clearCachedProvider()
-  setTimeout(() => window.location.reload(), 1)
-}
-
-let _ = window?.ethereum?.on('chainChanged', (chainId) => (
-  web3Modal.cachedProvider && (
-    setTimeout(() => window.location.reload(), 1)
-  )
-))
-
-_ = window?.ethereum?.on('accountsChanged', (accounts) => (
-  web3Modal.cachedProvider && (
-    setTimeout(() => window.location.reload(), 1)
-  )
-))

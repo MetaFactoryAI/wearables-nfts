@@ -88,7 +88,7 @@ export default ({
       })
       throw cause
     }
-  }, [ensProvider, contract, tokenId])
+  }, [ensProvider, contract, tokenId, address, toast])
 
   useEffect(() => {
     if(data?.token) {

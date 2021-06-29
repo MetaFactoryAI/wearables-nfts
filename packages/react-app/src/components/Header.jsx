@@ -11,15 +11,15 @@ import logo from '../logo.svg'
 import '@fontsource/crimson-text/600.css'
 
 let NetworkMismatch = ({
-  localChainId, selectedChainId, NETWORK,
+  targetChainId, selectedChainId, NETWORK,
 }) => {
   if(
-    localChainId && selectedChainId
-    && localChainId !== selectedChainId
+    targetChainId && selectedChainId
+    && targetChainId !== selectedChainId
   ) {
     return (
       <ChainAlert
-        {...{ NETWORK, selectedChainId, localChainId }}
+        {...{ NETWORK, selectedChainId, targetChainId }}
         position="absolute" top={3} right={0} zIndex={2}
       />
     )
@@ -90,20 +90,48 @@ const links = {
   },
 }
 
-export default ({
-  NETWORK, address, blockExplorer, targetNetwork,
-  localProvider, injectedProvider, mainnetProvider,
+const Links = ({ links, path }) => (
+  <ButtonGroup isAttached variant="outline">
+    <Wrap justify="center">
+      {Object.entries(links).map(
+        ([link, { title, icon }]) => (
+          <Tooltip
+            hasArrow key={link}
+            placement="bottom" label={title}
+          >
+            <Link to={link} style={{ margin: 0 }}>
+              <Button
+                title={title}
+                borderWidth={3}
+                colorScheme={link === path ? 'blue' : 'gray'}
+              >
+                {icon}
+              </Button>
+            </Link>
+          </Tooltip>
+        )
+      )}
+    </Wrap>
+  </ButtonGroup>
+)
+
+const Title = ({ title }) => (
+  <Link to="/">
+    <Flex>
+      <Image src={logo} h="2rem"/>
+      <Text ml={3} fontFamily="Crimson Text" fontSize={35}>
+        Wearables NFT Manager{title ? `: ${title}` : ''}
+      </Text>
+    </Flex>
+  </Link>
+)
+
+const Network = ({
+  toggleColorMode, colorMode, address, localProvider,
+  injectedProvider, mainnetProvider, blockExplorer,
   web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
-  ...props
+  targetChainId, NETWORK,
 }) => {
-  const location = useLocation()
-  const path = (
-    location.pathname
-    .replace(/^(\/[^/]*)(\/.+)?$/, (_, group) => group)
-  ) 
-  const title = paths[path]
-  const { colorMode, toggleColorMode } = useColorMode()
-  const localChainId = localProvider?._network?.chainId
   const [selectedChainId, setSelectedChainId] = useState(null)
 
   useEffect(() => {
@@ -115,73 +143,74 @@ export default ({
       })()
     }
   }, [injectedProvider])
-  
+
+  return (
+    <Flex mt={[5, '-1rem']} ml={1.5}>
+      <Flex>
+        <Button onClick={toggleColorMode} mx={1} p={0}>
+          {colorMode !== 'light' ? '🔆' : '🌛'}
+        </Button>
+        {address && (
+          <Account {...{
+            address,
+            injectedProvider,
+            mainnetProvider,
+            blockExplorer,
+          }}/>
+        )}
+      </Flex>
+      <Stack mr={5}>
+        <ConnectionButton {...{
+          web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
+        }}/>
+        <NetworkDisplay {...{
+          injectedProvider, NETWORK, selectedChainId,
+        }}/>
+      </Stack>
+      <NetworkMismatch {...{
+        targetChainId, selectedChainId, NETWORK,
+      }}/>
+    </Flex>
+  )
+}
+
+export default ({
+  ...props
+}) => {
+  const location = useLocation()
+  const path = (
+    location.pathname
+    .replace(/^(\/[^/]*)(\/.+)?$/, (_, group) => group)
+  ) 
+  const title = paths[path]
+  const { colorMode, toggleColorMode } = useColorMode()
+  const uiProps = {...props}
+  const netProps = {...props}
+
+  ;([
+    'NETWORK', 'targetNetwork', 'address', 'injectedProvider',
+    'mainnetProvider', 'web3Modal', 'loadWeb3Modal',
+    'logoutOfWeb3Modal', 'blockExplorer', 'targetChainId'
+  ])
+  .forEach((prop) => delete uiProps[prop])
+
+  Object.keys(uiProps).forEach((prop) => delete netProps[prop])
+
   return (
     <chakra.header
-      {...props} bg={colorMode === 'light' ? 'white' : 'gray.800'}
+      {...uiProps} bg={colorMode === 'light' ? 'white' : 'gray.800'}
       top={0} position={['inherit', 'sticky']} zIndex={2}
     >
       <Flex align="center" direction={['column', 'row']}>
-        <Link to="/">
-          <Flex>
-            <Image src={logo} h="2rem"/>
-            <Text ml={3} fontFamily="Crimson Text" fontSize={35}>
-              Wearables NFT Manager{title ? `: ${title}` : ''}
-            </Text>
-          </Flex>
-        </Link>
+        <Links {...{ links, path }}/>
         <Spacer grow={1}/>
-        <ButtonGroup isAttached variant="outline">
-          <Wrap justify="center">
-            {Object.entries(links).map(
-              ([link, { title, icon }]) => (
-                <Tooltip
-                  hasArrow key={link}
-                  placement="bottom" label={title}
-                >
-                  <Link to={link} style={{ margin: 0 }}>
-                    <Button
-                      title={title}
-                      borderWidth={3}
-                      colorScheme={link === path ? 'blue' : 'gray'}
-                    >
-                      {icon}
-                    </Button>
-                  </Link>
-                </Tooltip>
-              )
-            )}
-          </Wrap>
-        </ButtonGroup>
+        <Title {...{ title }}/>
         <Spacer grow={1}/>
-        <Flex mt={[5, '-1rem']} ml={1.5}>
-          <Flex>
-            <Button onClick={toggleColorMode} mx={1} p={0}>
-              {colorMode !== 'light' ? '🔆' : '🌛'}
-            </Button>
-            {address && (
-              <Account {...{
-                address,
-                localProvider,
-                injectedProvider,
-                mainnetProvider,
-                blockExplorer,
-              }}/>
-            )}
-          </Flex>
-          <Stack mr={5}>
-            <ConnectionButton {...{
-              web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
-            }}/>
-            <NetworkDisplay {...{
-              injectedProvider, NETWORK, selectedChainId,
-            }}/>
-          </Stack>
-        </Flex>
-        <NetworkMismatch {...{
-          localChainId, NETWORK, selectedChainId,
-        }}/>
+        <Network {...netProps} {...{ toggleColorMode }}/>
       </Flex>
+      <NetworkMismatch
+
+      />
     </chakra.header>
   )
 }

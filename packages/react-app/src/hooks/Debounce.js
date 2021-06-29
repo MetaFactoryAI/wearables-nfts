@@ -11,7 +11,7 @@ export default (value, delay) => {
     return () => {
       clearTimeout(handler)
     }
-  }, [value])
+  }, [value, delay])
 
   return debouncedValue
 }

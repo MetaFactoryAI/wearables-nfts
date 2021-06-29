@@ -20,5 +20,5 @@ export default (fn, delay, extraWatch) => {
 
   useEffect(() => {
     fn()
-  }, [extraWatch])
+  }, [extraWatch, fn])
 }
