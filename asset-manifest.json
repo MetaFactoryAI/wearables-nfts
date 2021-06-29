@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.js": "/nft-wearable/static/js/main.0a470b15.chunk.js",
-    "main.js.map": "/nft-wearable/static/js/main.0a470b15.chunk.js.map",
+    "main.js": "/nft-wearable/static/js/main.0d89d24a.chunk.js",
+    "main.js.map": "/nft-wearable/static/js/main.0d89d24a.chunk.js.map",
     "runtime-main.js": "/nft-wearable/static/js/runtime-main.14906420.js",
     "runtime-main.js.map": "/nft-wearable/static/js/runtime-main.14906420.js.map",
     "static/css/2.8ec53841.chunk.css": "/nft-wearable/static/css/2.8ec53841.chunk.css",
-    "static/js/2.cb4bcd3e.chunk.js": "/nft-wearable/static/js/2.cb4bcd3e.chunk.js",
-    "static/js/2.cb4bcd3e.chunk.js.map": "/nft-wearable/static/js/2.cb4bcd3e.chunk.js.map",
+    "static/js/2.ccb20231.chunk.js": "/nft-wearable/static/js/2.ccb20231.chunk.js",
+    "static/js/2.ccb20231.chunk.js.map": "/nft-wearable/static/js/2.ccb20231.chunk.js.map",
     "index.html": "/nft-wearable/index.html",
-    "precache-manifest.ce03dae208f2a035ff8d07c96bb7c613.js": "/nft-wearable/precache-manifest.ce03dae208f2a035ff8d07c96bb7c613.js",
+    "precache-manifest.ac890258a393d800dcf8c683c55f6899.js": "/nft-wearable/precache-manifest.ac890258a393d800dcf8c683c55f6899.js",
     "service-worker.js": "/nft-wearable/service-worker.js",
     "static/css/2.8ec53841.chunk.css.map": "/nft-wearable/static/css/2.8ec53841.chunk.css.map",
-    "static/js/2.cb4bcd3e.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.cb4bcd3e.chunk.js.LICENSE.txt",
+    "static/js/2.ccb20231.chunk.js.LICENSE.txt": "/nft-wearable/static/js/2.ccb20231.chunk.js.LICENSE.txt",
     "static/media/600.css": "/nft-wearable/static/media/crimson-text-latin-600-normal.f1f268fa.woff2",
     "static/media/eth.svg": "/nft-wearable/static/media/eth.ec81052f.svg",
     "static/media/logo.svg": "/nft-wearable/static/media/logo.25a43f77.svg"
@@ -19,7 +19,7 @@
   "entrypoints": [
     "static/js/runtime-main.14906420.js",
     "static/css/2.8ec53841.chunk.css",
-    "static/js/2.cb4bcd3e.chunk.js",
-    "static/js/main.0a470b15.chunk.js"
+    "static/js/2.ccb20231.chunk.js",
+    "static/js/main.0d89d24a.chunk.js"
   ]
 }
