@@ -4,7 +4,7 @@ import {
   Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex,
   Text, ModalOverlay, ModalContent, ModalHeader,
   ModalCloseButton, ModalBody, Select, ModalFooter, Modal,
-  useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip,
+  useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip, useToast,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory, useParams, Link, useLocation } from 'react-router-dom'
@@ -171,9 +171,122 @@ const ExpandShow = ({ name, button = null, children }) => {
   )
 }              
 
+const AttrRow = ({ attributes, setAttributes, index }) => {
+  const { name, value, type } = attributes[index]
+  const setter = useCallback(
+    (prop) => (
+      (value) => setAttributes(
+        (attrs) => ([
+          ...attrs.slice(0, index),
+          {...attrs[index], [prop]: value },
+          ...attrs.slice(index + 1)
+        ])
+      )
+    ), [setAttributes, index]
+  )
+  const setName = setter('name')
+  const setValue = setter('value')
+  const setType = setter('type')
+
+  return (
+    <Tr>
+      <Td><Input
+        value={name}
+        onChange={({ target: { value } }) => setName(value)}
+      /></Td>
+      <Td>{(() => {
+        switch(type) {
+        case 'date':
+          return (
+            <Input
+              type="date"
+              value={(new Date(value)).toISOString().split('T')[0]}
+              onChange={({ target: { value } }) => (
+                setValue((new Date(value)).getTime())
+              )}
+            />
+          )
+        case 'string':
+          return (
+            <Input
+              {...{ value }}
+              onChange={({ target: { value } }) => (
+                setValue(value)
+              )}
+            />
+          )
+        default:
+          return (
+            <Input
+              type="number"
+              {...{ value }}
+              onChange={({ target: { value } }) => (
+                setValue(!!value ? parseInt(value, 10) : '')
+              )}
+            />
+          )
+        }
+      })()}</Td>
+      <Td>
+        <Select
+          value={type}
+          onChange={({ target: { value }}) => (
+            setType(value)
+          )}>
+          <option value="string">String</option>
+          <option value="date">Date</option>
+          <option value="number">Number</option>
+          <option value="boost_percentage">
+            Boost Percentage
+          </option>
+          <option value="boost_number">
+            Boost Number
+          </option>
+        </Select>
+      </Td>
+      <Td><Tooltip label="Remove" hasArrow>
+        <Button
+          size="sm" ml={2}
+          onClick={() => setAttributes(
+            (attrs) => ([
+              ...attrs.slice(0, index),
+              ...attrs.slice(index + 1)
+            ])
+          )}
+        >
+          <CloseIcon/>
+        </Button>
+      </Tooltip></Td>
+    </Tr>
+  )
+}
+
+const Submit = ({ purpose, desiredNetwork }) => (
+  <Input
+    mt={3} variant="filled" type="submit"
+    value={capitalize(purpose)}
+    title={
+      !desiredNetwork ? `${capitalize(purpose)} NFT` : (
+        `Connect to the ${desiredNetwork} network.`
+      )
+    }
+    isDisabled={!!desiredNetwork}
+  />
+)
+
+const hasValue = (val) => {
+  if(Array.isArray(val)) {
+    return val.length > 0
+  }
+  if(val instanceof Object) {
+    return Object.keys(val).length > 0
+  }
+  return Boolean(val)
+}
+
 export default ({
   contract, purpose = 'create', onSubmit, desiredNetwork,
-  ensProvider, ...props
+  ensProvider, metadata,
 }) => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -183,7 +296,7 @@ export default ({
   const [animation, setAnimation] = useState()
   const [wearables, setWearables] = useState({})
   const [attributes, setAttributes] = useState([])
-  const [color, setColor] = useState('')
+  const [color, setColor] = useState('#FFFFFF')
   const [quantity, setQuantity] = useState(1)
   const [treasurer, setTreasurer] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -194,31 +307,37 @@ export default ({
   const history = useHistory()
   const params = useParams()
   const location = useLocation()
+  const toast = useToast()
   const refs = Object.fromEntries(
     ['quantity', 'treasurer', 'name', 'homepage', 'background']
     .map((attr) => [attr, useRef()])
   )
 
   useEffect(() => {
-    Object.entries({
-      name: setName, description: setDescription,
-      external_url: setHomepage, animation_url: setAnimation,
-      image: setImage, treasurer: setTreasurer,
-    })
-    .forEach(([prop, setter]) => {
-      !!props[prop] && setter(
-        (val) => !!val ? val : props[prop]
-      )
-    })
-    props.properties?.wearables && setWearables(
-      (val) => (
-        Object.keys(val).length > 0 ? val : props.properties?.wearables
-      )
-    )
-    props.background_color && setColor(
-      (val) => !!val ? val : `#${props.background_color}`
-    )
-  }, [props])
+    if(metadata) {
+      Object.entries({
+        name: setName, description: setDescription,
+        external_url: setHomepage, animation_url: setAnimation,
+        image: setImage, treasurer: setTreasurer,
+        attributes: setAttributes,
+      })
+      .forEach(([prop, setter]) => {
+        setter(metadata[prop])
+      })
+
+      const attrs = metadata.attributes
+      if(hasValue(attrs)) {
+        setAttributes(attrs.map(({
+          trait_type: name, value, display_type: type = 'string',
+        }) => ({ name, value, type })))
+      }
+
+      setWearables(metadata.properties?.wearables ?? {})
+
+      const bg = metadata.background_color
+      setColor(prev => bg ? `#${bg}` : prev)
+    }
+  }, [metadata])
 
   useEffect(() => {
     ((async () => {
@@ -235,7 +354,6 @@ export default ({
   }, [contract, purpose, homepage])
 
   useEffect(() => {
-    console.info(location.hash)
     if(location.hash) {
       const elem = document.getElementById(
         location.hash.substring(1)
@@ -281,26 +399,36 @@ export default ({
   }
 
   const enact = useCallback(async (metadata) => {
-    if(purpose === 'create') {
-      const enact = (
-        window.confirm(
-          `¿Mint ${quantity} token${
-            quantity === 1 ? '' : 's'
-          } to ${treasurer}?`
+    try {
+      if(purpose === 'create') {
+        const enact = (
+          window.confirm(
+            `¿Mint ${quantity} token${
+              quantity === 1 ? '' : 's'
+            } to ${treasurer}?`
+          )
         )
-      )
-      if(enact) {
-        const address = ensProvider.resolveName(treasurer)
-        await contract.mint(address, quantity, metadata, [])
-        history.push('/')
+        if(enact) {
+          const address = ensProvider.resolveName(treasurer)
+          await contract.mint(address, quantity, metadata, [])
+          history.push('/')
+        }
+      } else if(purpose === 'update') {
+        const [tokenId] = params.id.split('-').slice(-1)
+        await contract.setURI(metadata, parseInt(tokenId, 16))
       }
-    } else if(purpose === 'update') {
-      const [tokenId] = params.id.split('-').slice(-1)
-      await contract.setURI(metadata, parseInt(tokenId, 16))
+    } catch(err) {
+      toast({
+        title: 'Contract Error',
+        description: err.message,
+        status: 'error',
+        isClosable: true,
+        duration: 10000
+      })
     }
   }, [
     purpose, contract, quantity, history, params.id,
-    treasurer, ensProvider,
+    treasurer, ensProvider, toast,
   ])
 
   const submit = async (evt) => {
@@ -331,7 +459,9 @@ export default ({
     }
 
     if(color.startsWith('#')) {
-      metadata.background_color = color.substring(1)
+      metadata.background_color = (
+        color.substring(1).toUpperCase()
+      )
     }
 
     metadata.properties = {}
@@ -374,20 +504,13 @@ export default ({
     await enact(dataURI)
   }
 
-  useEffect(() => {
-    setAttributes([
-      { name: 'Designer', value: 'dysbulic', type: 'string' },
-      { name: 'Drop Date', value: (new Date()).getTime(), type: 'date' },
-      { name: 'Release Size', value: 23, type: 'number' },
-    ])
-  }, [])
-
   return (
     <Container
       as="form" onSubmit={submit}
       mt={10} maxW={['100%', 'min(85vw, 50em)']}
       sx={{ a: { textDecoration: 'underline' } }}
     >
+      <Submit {...{ purpose, desiredNetwork }}/>
       <UnorderedList listStyleType="none">
         {purpose === 'create' && (
           <ListItem ref={refs.quantity}>
@@ -428,9 +551,61 @@ export default ({
             <Flex align="center">
               <Label name="Name" box={refs.name}/>
               <Input
-                value={name}
+                value={name} autoFocus={purpose !== 'create'}
                 onChange={({ target: { value } }) => setName(value)}
               />
+            </Flex>
+          </FormControl>
+        </ListItem>
+        <ListItem>
+          <ExpandShow name="Image">
+            <Box m={3}>
+              <Input
+                type="file" accept="image/*"
+                ref={imageRef} onChange={configImage}
+                display={image ? 'none' : 'inherit'}
+                h="auto"
+              />
+              {image && (<Image
+                src={
+                  (image instanceof File) ? (
+                    URL.createObjectURL(image)
+                  ) : (
+                    httpURL(image)
+                  )
+                }
+                maxH={60} mt={0} bg={color}
+                onClick={() => imageRef.current?.click()}
+              />)}
+            </Box>
+          </ExpandShow>
+        </ListItem>
+        <ListItem ref={refs.background}>
+          <FormControl mt={3}>
+            <Flex align="center">
+              <Label name="Background Color" box={refs.background}/>
+              <Input
+                type="color" value={color}
+                onChange={({ target: { value }}) => setColor(value)}
+              />
+            </Flex>
+          </FormControl>
+        </ListItem>
+        <ListItem ref={refs.homepage}>
+          <FormControl mt={3}>
+            <Flex align="center">
+              <Label name="Homepage" box={refs.homepage}/>
+              <Input
+                value={homepage}
+                onChange={({ target: { value } }) => (
+                  setHomepage(value)
+                )}
+              />
+              {homepage?.length > 0 && (
+                <chakra.a ml={2} href={homepage} target="_blank">
+                  <ExternalLinkIcon/>
+                </chakra.a>
+              )}
             </Flex>
           </FormControl>
         </ListItem>
@@ -459,60 +634,6 @@ export default ({
               </TabPanels>
             </Tabs>
           </ExpandShow>
-        </ListItem>
-        <ListItem ref={refs.homepage}>
-          <FormControl mt={3}>
-            <Flex align="center">
-              <Label name="Homepage" box={refs.homepage}/>
-              <Input
-                value={homepage}
-                onChange={({ target: { value } }) => (
-                  setHomepage(value)
-                )}
-              />
-              {homepage?.length > 0 && (
-                <chakra.a ml={2} href={homepage} target="_blank">
-                  <ExternalLinkIcon/>
-                </chakra.a>
-              )}
-            </Flex>
-          </FormControl>
-        </ListItem>
-        <ListItem>
-          <ExpandShow name="Image">
-            <Box m={3}>
-              <Input
-                type="file" accept="image/*"
-                ref={imageRef} onChange={configImage}
-                display={image ? 'none' : 'inherit'}
-                h="auto"
-              />
-              {image && (
-                <Image
-                  src={
-                    (image instanceof File) ? (
-                      URL.createObjectURL(image)
-                    ) : (
-                      httpURL(image)
-                    )
-                  }
-                  maxH={60} mt={0} bg={color}
-                  onClick={() => imageRef.current?.click()}
-                />
-              )}
-            </Box>
-          </ExpandShow>
-        </ListItem>
-        <ListItem ref={refs.background}>
-          <FormControl mt={3}>
-            <Flex align="center">
-              <Label name="Background Color" box={refs.background}/>
-              <Input
-                type="color" value={color}
-                onChange={({ target: { value }}) => setColor(value)}
-              />
-            </Flex>
-          </FormControl>
         </ListItem>
         <ListItem>
           <ExpandShow name="Animation">
@@ -568,50 +689,11 @@ export default ({
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {attributes.map(({ name, value, type }, idx) => (
-                    <Tr key={idx}>
-                      <Td>{name}</Td>
-                      <Td>{(() => {
-                        switch(type) {
-                        case 'date':
-                          return (
-                            (new Date(value)).toLocaleDateString(
-                              undefined,
-                              {
-                                weekday: 'long', year: 'numeric',
-                                month: 'long', day: 'numeric',
-                              },
-                            )
-                          )
-                        default:
-                          return value?.toString() ?? null
-                        }
-                      })()}</Td>
-                      <Td>
-                        <Select value={type} onChange={() => ''}>
-                          <option value="string">String</option>
-                          <option value="date">Date</option>
-                          <option value="number">Number</option>
-                          <option value="boost_percentage">
-                            Boost Percentage
-                          </option>
-                          <option value="boost_number">
-                            Boost Number
-                          </option>
-                        </Select>
-                      </Td>
-                      <Td><Tooltip label="Remove" hasArrow>
-                        <Button
-                          size="sm" ml={2}
-                          onClick={() => setAttributes((attrs) => ([
-                              ...attrs.slice(0, idx),
-                              ...attrs.slice(idx + 1)
-                          ]))}
-                        >
-                          <CloseIcon/>
-                        </Button>
-                      </Tooltip></Td>
-                    </Tr>
+                  {attributes.map((_, index) => (
+                    <AttrRow {...{
+                      attributes, setAttributes,
+                      index, key: index,
+                    }}/>
                   ))}
                 </Tbody>
               </Table>
@@ -646,16 +728,7 @@ export default ({
           </ExpandShow>
         </ListItem>
       </UnorderedList>
-      <Input
-        mt={3} variant="filled" type="submit"
-        value={capitalize(purpose)}
-        title={
-          !desiredNetwork ? `${capitalize(purpose)} NFT` : (
-            `Connect to the ${desiredNetwork} network.`
-          )
-        }
-        isDisabled={!!desiredNetwork}
-      />
+      <Submit {...{ purpose, desiredNetwork }}/>
     </Container>
   )
 }

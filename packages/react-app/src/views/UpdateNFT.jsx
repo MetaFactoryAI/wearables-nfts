@@ -84,49 +84,9 @@ export default ({ contract, desiredNetwork }) => {
     )
   }
 
-  const overwrite = async (evt) => {
-    evt.preventDefault()
-    const res = await fetch(httpURL(newMetadata))
-    const metadata = res.json()
-    await contract.setURI(newMetadata, tokenId)
-    setMetadata(metadata)
-  }
-
-  if(metadata === null || query.get('overwrite')) {
-    return (
-      <Container as="form" onSubmit={overwrite} mt={10}>
-        <FormControl isRequired>
-          <FormLabel>New Metadata</FormLabel>
-          <Input
-            value={newMetadata}
-            onChange={(evt) => (
-              setNewMetadata(evt.target.value)
-            )}
-            placeholder={(() => {
-              let msg = ((metadata === null) ? (
-                "Metadata is corrupt."
-              ) : (
-                "Metadata override requested."
-              ))
-              return `${msg} Provide a replacement.`
-            })()}
-          />
-        </FormControl>
-        <Button
-          type="submit" isDisabled={!desiredNetwork} mt={5}
-          title={desiredNetwork ? 'Replace Metadata' : (
-            `Connect to the ${desiredNetwork} network.`
-          )}
-        >
-          Overwrite Metadata
-        </Button>
-      </Container>
-    )
-  }
-
   return (
     <NFTForm
-      purpose="update" {...metadata}
+      purpose="update" {...{ metadata }}
       {...{ contract, desiredNetwork }}
     />
   )
