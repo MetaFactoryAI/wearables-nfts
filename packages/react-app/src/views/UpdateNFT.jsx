@@ -1,6 +1,5 @@
 import {
-  Button, Spinner, FormControl, Container, Input,
-  FormLabel, Box, Alert, AlertIcon,
+  Spinner, Container, Box, Alert, AlertIcon,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
@@ -26,10 +25,7 @@ const useQueryParams = () => (
 
 export default ({ contract, desiredNetwork }) => {
   const [metadata, setMetadata] = useState()
-  const [newMetadata, setNewMetadata] = useState('')
-  const [tokenId, setTokenId] = useState()
-  const query = useQueryParams()
-
+  
   const params = useParams()
   let id = params.id?.toLowerCase()
   if(!id.includes('-')) {
@@ -43,8 +39,6 @@ export default ({ contract, desiredNetwork }) => {
 
   useEffect(() => {
     if(data?.token) {
-      setTokenId(data.token.identifier)
-
       ;(async () => {
         const res = await fetch(httpURL(data.token.URI))
         if(res.ok) {

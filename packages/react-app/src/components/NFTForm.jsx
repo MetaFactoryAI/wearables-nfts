@@ -172,7 +172,9 @@ const ExpandShow = ({ name, button = null, children }) => {
 }              
 
 const AttrRow = ({ attributes, setAttributes, index }) => {
-  const { name, value, type } = attributes[index]
+  const { name = '', value = '', type = 'string' } = (
+    attributes[index]
+  )
   const setter = useCallback(
     (prop) => (
       (value) => setAttributes(
@@ -319,7 +321,6 @@ export default ({
         name: setName, description: setDescription,
         external_url: setHomepage, animation_url: setAnimation,
         image: setImage, treasurer: setTreasurer,
-        attributes: setAttributes,
       })
       .forEach(([prop, setter]) => {
         setter(metadata[prop])
