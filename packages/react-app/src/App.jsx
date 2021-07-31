@@ -8,9 +8,10 @@ import {
 import { Box } from '@chakra-ui/react'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { useUserAddress } from 'eth-hooks'
 import { Helmet } from 'react-helmet'
-import { useContractLoader, useLookupAddress } from './hooks'
+import {
+  useContractLoader, useLookupAddress, useUserAddress,
+} from './hooks'
 import { Header } from './components'
 import { INFURA_ID, NETWORK, NETWORKS } from './constants'
 import ExistingNFTs from './views/ExistingNFTs'
@@ -67,30 +68,28 @@ export default () => {
   }
 
   useEffect(() => {
-    window.ethereum.on('chainChanged', loadWeb3Modal)
-    window.ethereum.on('accountsChanged', loadWeb3Modal)
+    const chainSub = window.ethereum.on(
+      'chainChanged', loadWeb3Modal
+    )
+    const accountSub = window.ethereum.on(
+      'accountsChanged', loadWeb3Modal
+    )
     return () => {
-      window.ethereum.unsubscribe(
-        'chainChanged', loadWeb3Modal
-      )
-      window.ethereum.unsubscribe(
-        'accountsChanged', loadWeb3Modal
-      )
+      let _ = window.ethereum.unsubscribe?.(chainSub)
+      _ = window.ethereum.unsubscribe?.(accountSub)
     }
   }, [loadWeb3Modal])
 
   useEffect(() => {
     (async () => {
-      if(injectedProvider) {
-        const chainId = (await injectedProvider.getNetwork()).chainId
-        setDesiredNetwork(
-          chainId !== targetNetwork.chainId ? (
-            capitalize(targetNetwork.name)
-          ) : (
-            null
-          )
+      const chainId = (await injectedProvider?.getNetwork())?.chainId
+      setDesiredNetwork(
+        chainId !== targetNetwork.chainId ? (
+          capitalize(targetNetwork.name)
+        ) : (
+          null
         )
-      }
+      )
     })()
   }, [injectedProvider])
 

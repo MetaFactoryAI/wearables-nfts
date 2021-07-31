@@ -6,6 +6,7 @@ import {
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Link, useHistory } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
+import demarkdown from 'remove-markdown'
 import registryAddress from '../contracts/WearablesNFTs.address'
 import { httpURL } from '../helpers'
 
@@ -55,7 +56,7 @@ export default ({ action = null }) => {
                   ...tkn,
                   loading: false,
                   name: meta.name,
-                  description: meta.description,
+                  description: demarkdown(meta.description),
                   image: httpURL(meta.image),
                 }
               }

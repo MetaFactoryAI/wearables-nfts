@@ -34,6 +34,8 @@
     "@fontsource/crimson-text": "^4.4.5",
     "@loadable/component": "^5.15.0",
     "@ramp-network/ramp-instant-sdk": "^2.2.0",
+    "@react-three/drei": "^7.2.2",
+    "@react-three/fiber": "^7.0.6",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.8",
@@ -67,6 +69,8 @@
     "react-qr-reader": "^2.2.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
+    "remove-markdown": "^0.3.0",
+    "three": "^0.130.1",
     "web3modal": "^1.9.1"
   },
   "devDependencies": {

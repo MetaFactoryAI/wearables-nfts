@@ -1,5 +1,9 @@
 {
   "name": "nft-wearable",
+  "author": {
+    "name": "Will Holcomb",
+    "email": "dys@dhappy.org"
+  },
   "version": "0.2.0",
   "keywords": [
     "ethereum",

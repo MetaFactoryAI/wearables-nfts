@@ -4,7 +4,7 @@ import {
   Tabs, Tab, TabList, TabPanels, TabPanel, Textarea, Flex,
   Text, ModalOverlay, ModalContent, ModalHeader,
   ModalCloseButton, ModalBody, Select, ModalFooter, Modal,
-  useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip, useToast,
+  useDisclosure, Table, Thead, Tbody, Tr, Th, Td, Tooltip, useToast, Heading,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory, useParams, Link, useLocation } from 'react-router-dom'
@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import { AddIcon, CloseIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { create as ipfsHttpClient } from 'ipfs-http-client'
 import { httpURL, capitalize } from '../helpers'
+import { NFT_HOMEPAGE_BASE } from '../constants'
 
 const ModelModal = ({
   isOpen, onClose, setWearables,
@@ -105,20 +106,12 @@ const Anchor = ({ name, box }) => {
     const elem = box?.current
     if(elem) {
       const over = () => setVisible(true)
-      elem.addEventListener(
-        'mouseover', over
-      )
+      elem.addEventListener('mouseover', over)
       const out = () => setVisible(false)
-      elem.addEventListener(
-        'mouseout', out
-      )
+      elem.addEventListener('mouseout', out)
       return () => {
-        elem.removeEventListener(
-          'mouseover', over
-        )
-        elem.removeEventListener(
-          'mouseout', out
-        )
+        elem.removeEventListener('mouseover', over)
+        elem.removeEventListener('mouseout', out)
       }
     }
   }, [box])
@@ -263,9 +256,9 @@ const AttrRow = ({ attributes, setAttributes, index }) => {
   )
 }
 
-const Submit = ({ purpose, desiredNetwork }) => (
+const Submit = ({ purpose, desiredNetwork, ...props }) => (
   <Input
-    mt={3} variant="filled" type="submit"
+    variant="filled" type="submit"
     value={capitalize(purpose)}
     title={
       !desiredNetwork ? `${capitalize(purpose)} NFT` : (
@@ -273,6 +266,7 @@ const Submit = ({ purpose, desiredNetwork }) => (
       )
     }
     isDisabled={!!desiredNetwork}
+    {...props}
   />
 )
 
@@ -343,13 +337,17 @@ export default ({
   useEffect(() => {
     ((async () => {
       if(!!contract && purpose === 'create' && !homepage) {
-        const nextId = (
-          (parseInt(await contract.tokenCount(), 16) + 1)
-          .toString(16)
-        )
-        setHomepage(
-          `https://dysbulic.github.io/nft-wearable/#/view/0x${nextId}`
-        ) 
+        try {
+          const nextId = (
+            (parseInt(await contract.tokenCount(), 16) + 1)
+            .toString(16)
+          )
+          setHomepage(
+            `${NFT_HOMEPAGE_BASE}/0x${nextId}`
+          )
+        } catch(err) {
+          console.error('Get Token Id', err.message)
+        }
       }
     })())
   }, [contract, purpose, homepage])
@@ -505,13 +503,21 @@ export default ({
     await enact(dataURI)
   }
 
+  if(desiredNetwork) {
+    return (
+      <Heading size="sm" mt={20} align="center">
+        Please change your network to {desiredNetwork}.
+      </Heading>
+    )
+  }
+
   return (
     <Container
       as="form" onSubmit={submit}
       mt={10} maxW={['100%', 'min(85vw, 50em)']}
       sx={{ a: { textDecoration: 'underline' } }}
     >
-      <Submit {...{ purpose, desiredNetwork }}/>
+      <Submit {...{ purpose, desiredNetwork }} mb={3}/>
       <UnorderedList listStyleType="none">
         {purpose === 'create' && (
           <ListItem ref={refs.quantity}>
@@ -729,7 +735,7 @@ export default ({
           </ExpandShow>
         </ListItem>
       </UnorderedList>
-      <Submit {...{ purpose, desiredNetwork }}/>
+      <Submit {...{ purpose, desiredNetwork }} mt={3}/>
     </Container>
   )
 }

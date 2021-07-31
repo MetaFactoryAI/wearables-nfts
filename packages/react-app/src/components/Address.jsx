@@ -14,7 +14,9 @@ const blockExplorerLink = (
 export default (props) => {
   const { SecondLine = null } = props
   const address = props.value ?? props.address
-  const ens = useLookupAddress(props.ensProvider, address)
+  const ens = useLookupAddress({
+    provider: props.ensProvider, address
+  })
 
   if(!address) {
     return (
@@ -27,13 +29,13 @@ export default (props) => {
 
   let displayAddress = `${address.substr(0, 6)}…`
 
-  if(ens && !ens.startsWith("0x")) {
+  if(ens && !/^0x[0-9a-f]{40}$/i.test(ens)) {
     displayAddress = ens
-  } else if(props.size === "short") {
+  } else if(props.size === 'short') {
     displayAddress += address.substr(-4)
-  } else if(props.size === "medium") {
+  } else if(props.size === 'medium') {
     displayAddress += address.substr(-9)
-  } else if(props.size === "long") {
+  } else if(props.size === 'long') {
     displayAddress = address
   }
 

@@ -1,15 +1,18 @@
 import {
   Spinner, Container, UnorderedList, ListItem, Box,
-  Image, Heading, Alert, AlertIcon, useToast,
+  Image, Heading, Alert, AlertIcon, useToast, Flex, Text, Link,
 } from '@chakra-ui/react'
 import { useQuery, gql } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import contractAddress from '../contracts/WearablesNFTs.address'
 import { httpURL } from '../helpers'
 import EditOrList from './EditOrList'
 import { useHistory } from 'react-router-dom'
+import { Box3, Vector3, Color } from 'three'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, useGLTF, Center, Environment } from '@react-three/drei'
 
 const TOKEN = gql(`
   query GetToken($id: String!) {
@@ -28,6 +31,48 @@ export default (props) => {
   const history = useHistory()
   const params = useParams()
   const toast = useToast()
+
+  const Scene = ({ source }) => {
+    const { scene } = useGLTF(source)
+    const bBox = new Box3()
+    bBox.setFromObject(scene)
+    const size = bBox.getSize(new Vector3()).length();
+    const fov = 50
+    const near = size / 100;
+    const far = size * 100;
+    const position = [
+      0,
+      0,
+      size,
+    ]
+    scene.background = new Color('#FF0000')
+    const lights = [[0, 0, size], [0, 0, -size]]
+    return (
+      <Canvas
+        style={{ height: '100%' }}
+        camera={{ position, fov, near, far }}
+      >
+        <color attach="background" args={[`#${metadata?.background_color}`]}/>
+        <Center>
+          <primitive object={scene}/>
+        </Center>
+        <ambientLight intensity={0.1} />
+        {lights.map((light, idx) => (
+          <directionalLight key={idx} position={light} intensity={0.75}/>
+        ))}
+        <OrbitControls />
+      </Canvas>
+    )
+  }
+
+  const Model = ({ source }) => {
+    if(!wearables?.['model/gltf-binary']) return null
+    return (
+      <Suspense fallback={null}>
+        <Scene source={httpURL(wearables['model/gltf-binary'])}/>
+      </Suspense>
+    )
+  }
 
   let id = params.id?.toLowerCase()
   if(!id.includes('-')) {
@@ -57,6 +102,7 @@ export default (props) => {
           if(res.ok) {
             try {
               const metadata = await res.json()
+              metadata.uri = httpURL(data.token.URI)
               setMetadata(metadata)
             } catch(err) { // invalid JSON
               setMetadata(null)
@@ -105,44 +151,51 @@ export default (props) => {
 
   return (
     <Container sx={{ a: { textDecoration: 'underline' } }}>
-      <Heading size="md" my={5} align="center">
+      <Heading size="lg" my={5} align="center">
         {metadata.name}
       </Heading>
-      <UnorderedList>
-        <ListItem>Token ID: {tokenId}</ListItem>
-        <ListItem>Description:
-          <Box ml={5}>
-            <ReactMarkdown linkTarget="_blank">
-              {metadata.description}
-            </ReactMarkdown>
-          </Box>
-        </ListItem>
-        <ListItem>Homepage:{' '}
-          {homepage ? (
-            <a href={homepage} target="_blank" rel="noopener noreferrer">
-              {homepage}
-            </a>
-          ) : <em>None</em>}
-        </ListItem>
-        <ListItem>Image:
-          <Image src={httpURL(metadata.image)} maxH="15em"/>
-        </ListItem>
-        <ListItem>Models:{' '}
-          {Object.keys(wearables).length === 0 ? (
-            <em>None</em>
+      <Flex direction={{ base: 'column', sm: 'row' }} align="center">
+        <Box h="90vmin" w="90vmin" minW="75vmin" border="2px solid black">
+          {wearables['model/gltf-binary'] ? (
+            <Model/>
           ) : (
-            <UnorderedList>
-              {Object.entries(wearables).map(
-                ([mimetype, model]) => (
-                  <ListItem key={mimetype}>
-                    <a href={httpURL(model)}>{mimetype}</a>
-                  </ListItem>
-                )
-              )}
-            </UnorderedList>
+            <Image src={httpURL(metadata.image)}/>
           )}
-        </ListItem>
-      </UnorderedList>
+        </Box>
+        <Box
+          ml={5} sx={{
+            hr: { my: 3 },
+            'p, li': { mb: 3, textAlign: 'justify' },
+          }}>
+          <ReactMarkdown linkTarget="_blank">
+            {metadata.description}
+          </ReactMarkdown>
+        </Box>
+      </Flex>
+      {homepage && (
+        <Link href={homepage} isExternal title="Homepage">
+          🏡
+        </Link>
+      )}
+      {metadata?.uri && (
+        <Link href={metadata.uri} isExternal title="Metadata">
+          🗄
+        </Link>
+      )}
+      <Heading size="sm">Models:</Heading>
+      {Object.keys(wearables).length === 0 ? (
+        <Text><em>None</em></Text>
+      ) : (
+        <UnorderedList>
+          {Object.entries(wearables).map(
+            ([mimetype, model]) => (
+              <ListItem key={mimetype}>
+                <a href={httpURL(model)}>{mimetype}</a>
+              </ListItem>
+            )
+          )}
+        </UnorderedList>
+      )}
     </Container>
   )
 }

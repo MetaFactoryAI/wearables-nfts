@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Box, Button, chakra, Flex, Image, Spacer, Stack, Text, Tooltip,
-  ButtonGroup, useColorMode, Wrap,
+  ButtonGroup, useColorMode, Wrap, Grid,
 } from '@chakra-ui/react'
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 import { Link, useLocation } from 'react-router-dom'
@@ -10,7 +10,7 @@ import Account from './Account'
 import logo from '../logo.svg'
 import '@fontsource/crimson-text/600.css'
 
-let NetworkMismatch = ({
+const NetworkMismatch = ({
   targetChainId, selectedChainId, NETWORK,
 }) => {
   if(
@@ -115,9 +115,9 @@ const Links = ({ links, path }) => (
   </ButtonGroup>
 )
 
-const Title = ({ title }) => (
+const Title = ({ title, ...props }) => (
   <Link to="/">
-    <Flex>
+    <Flex {...props}>
       <Image src={logo} h="2rem"/>
       <Text ml={3} fontFamily="Crimson Text" fontSize={35}>
         Wearables NFT Manager{title ? `: ${title}` : ''}
@@ -127,39 +127,56 @@ const Title = ({ title }) => (
 )
 
 const Network = ({
-  toggleColorMode, colorMode, address, localProvider,
+  toggleColorMode, colorMode, address,
   injectedProvider, mainnetProvider, blockExplorer,
   web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
-  targetChainId, NETWORK,
+  targetChainId, NETWORK, path,
 }) => {
   const [selectedChainId, setSelectedChainId] = useState(null)
 
   useEffect(() => {
-    if(injectedProvider) {
-      (async () => {
-        setSelectedChainId(
-          (await injectedProvider.getNetwork()).chainId
-        )
-      })()
-    }
+    (async () => {
+      setSelectedChainId(
+        (await injectedProvider?.getNetwork())?.chainId ?? null
+      )
+    })()
   }, [injectedProvider])
 
   return (
-    <Flex mt={[5, '-1rem']} ml={1.5}>
-      <Flex>
-        <Button onClick={toggleColorMode} mx={1} p={0}>
-          {colorMode !== 'light' ? '🔆' : '🌛'}
-        </Button>
-        {address && (
-          <Account {...{
+    <Grid
+      gridTemplateColumns={{
+        base: '1fr 1fr [end]', sm: (
+          `${address ? '0fr 1fr 0fr' : '0fr 0fr'} [end]`
+        )
+      }}
+      alignSelf={{ base: 'center', sm: 'start' }}
+      mt={[2, '-1rem']} ml={1.5}
+    >
+      <Button
+        gridColumn={1}
+        gridRow={{ base: 2, sm: 1 }}
+        onClick={toggleColorMode}
+        mx={1} p={0}
+      >
+        {colorMode !== 'light' ? '🔆' : '🌛'}
+      </Button>
+      {address && (
+        <Account
+          gridColumn={{ base: '1 / span 3', sm: 2 }}
+          gridRow={1}
+          {...{
             address,
             injectedProvider,
             mainnetProvider,
             blockExplorer,
-          }}/>
-        )}
-      </Flex>
-      <Stack mr={5}>
+          }}
+        />
+      )}
+      <Stack
+        gridColumn="end"
+        gridRow={{ base: 2, sm: 1 }}
+        mr={5}
+      >
         <ConnectionButton {...{
           web3Modal, loadWeb3Modal, logoutOfWeb3Modal,
         }}/>
@@ -167,10 +184,14 @@ const Network = ({
           injectedProvider, NETWORK, selectedChainId,
         }}/>
       </Stack>
-      <NetworkMismatch {...{
-        targetChainId, selectedChainId, NETWORK,
-      }}/>
-    </Flex>
+      {!['/view', '/'].includes(path) && (
+        <NetworkMismatch
+          {...{
+            targetChainId, selectedChainId, NETWORK,
+          }}
+        />
+      )}
+    </Grid>
   )
 }
 
@@ -204,9 +225,9 @@ export default ({
       <Flex align="center" direction={['column', 'row']}>
         <Links {...{ links, path }}/>
         <Spacer grow={1}/>
-        <Title {...{ title }}/>
+        <Title {...{ title }} mt={{ base: 2, sm: 0 }}/>
         <Spacer grow={1}/>
-        <Network {...netProps} {...{ toggleColorMode }}/>
+        <Network {...netProps} {...{ toggleColorMode, path }}/>
       </Flex>
       <NetworkMismatch
 
