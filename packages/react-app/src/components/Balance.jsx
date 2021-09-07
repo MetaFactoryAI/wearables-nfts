@@ -2,7 +2,7 @@ import React from 'react'
 import { formatEther } from '@ethersproject/units'
 import { Flex, Image } from '@chakra-ui/react'
 import { useBalance } from '../hooks'
-import eth from '../eth.svg'
+import eth from '../ethereum.svg'
 
 export default ({
   provider, address, balance: input, value, size, ...props

@@ -122,6 +122,7 @@ export default ({ action = null }) => {
           }
           return (
             <Tr
+              id={`token-${token.metadata}`}
               key={idx} onClick={redirect}
               _hover={{ bg: action ? '#F3FF0033' : '#0000FF11' }}
             >

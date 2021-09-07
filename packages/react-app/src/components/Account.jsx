@@ -18,7 +18,8 @@ export default ({
       ) : (
         <Address
           {...{
-            address, blockExplorer,
+            address,
+            blockExplorer,
             blockieClick,
             size,
           }}

@@ -68,15 +68,15 @@ export default () => {
   }
 
   useEffect(() => {
-    const chainSub = window.ethereum.on(
+    const chainSub = window.ethereum?.on(
       'chainChanged', loadWeb3Modal
     )
-    const accountSub = window.ethereum.on(
+    const accountSub = window.ethereum?.on(
       'accountsChanged', loadWeb3Modal
     )
     return () => {
-      let _ = window.ethereum.unsubscribe?.(chainSub)
-      _ = window.ethereum.unsubscribe?.(accountSub)
+      let _ = window.ethereum?.unsubscribe?.(chainSub)
+      _ = window.ethereum?.unsubscribe?.(accountSub)
     }
   }, [loadWeb3Modal])
 

@@ -1,3 +1,6 @@
+import polygonIcon from './polygon.svg'
+import ethIcon from './ethereum.svg'
+
 // From: https://infura.io/dashboard/ethereum
 export const INFURA_ID = '79a107f3e7784d31bcedd6fba13d93e9'
 
@@ -17,6 +20,7 @@ export const DAI_ABI = [{"inputs":[{"internalType":"uint256","name":"chainId_","
 export const NETWORK = (chainId) => {
   for(let props of Object.values(NETWORKS)) {
     if(props.chainId === chainId) {
+      if(!props.icon) props.icon = ethIcon
       return props
     }
   }
@@ -88,6 +92,7 @@ export const NETWORKS = {
     rpcUrl: 'https://rpc-mainnet.maticvigil.com',
     faucet: 'https://faucet.matic.network/',
     blockExplorer: 'https://explorer-mainnet.maticvigil.com//',
+    icon: polygonIcon,
   },
   mumbai: {
     name: 'mumbai',

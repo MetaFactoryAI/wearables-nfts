@@ -13,6 +13,7 @@ import { useHistory } from 'react-router-dom'
 import { Box3, Vector3, Color } from 'three'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, useGLTF, Center, Environment } from '@react-three/drei'
+import { Helmet } from 'react-helmet'
 
 const TOKEN = gql(`
   query GetToken($id: String!) {
@@ -40,19 +41,16 @@ export default (props) => {
     const fov = 50
     const near = size / 100;
     const far = size * 100;
-    const position = [
-      0,
-      0,
-      size,
-    ]
-    scene.background = new Color('#FF0000')
+    const position = [0, 0, size]
     const lights = [[0, 0, size], [0, 0, -size]]
     return (
       <Canvas
         style={{ height: '100%' }}
         camera={{ position, fov, near, far }}
       >
-        <color attach="background" args={[`#${metadata?.background_color}`]}/>
+        {metadata?.background_color && (
+          <color attach="background" args={[`#${metadata.background_color}`]}/>
+        )}
         <Center>
           <primitive object={scene}/>
         </Center>
@@ -150,52 +148,72 @@ export default (props) => {
   }
 
   return (
-    <Container sx={{ a: { textDecoration: 'underline' } }}>
-      <Heading size="lg" my={5} align="center">
-        {metadata.name}
-      </Heading>
-      <Flex direction={{ base: 'column', sm: 'row' }} align="center">
-        <Box h="90vmin" w="90vmin" minW="75vmin" border="2px solid black">
-          {wearables['model/gltf-binary'] ? (
-            <Model/>
-          ) : (
-            <Image src={httpURL(metadata.image)}/>
-          )}
-        </Box>
-        <Box
-          ml={5} sx={{
-            hr: { my: 3 },
-            'p, li': { mb: 3, textAlign: 'justify' },
-          }}>
-          <ReactMarkdown linkTarget="_blank">
-            {metadata.description}
-          </ReactMarkdown>
-        </Box>
-      </Flex>
-      {homepage && (
-        <Link href={homepage} isExternal title="Homepage">
-          🏡
-        </Link>
-      )}
-      {metadata?.uri && (
-        <Link href={metadata.uri} isExternal title="Metadata">
-          🗄
-        </Link>
-      )}
-      <Heading size="sm">Models:</Heading>
-      {Object.keys(wearables).length === 0 ? (
-        <Text><em>None</em></Text>
-      ) : (
-        <UnorderedList>
-          {Object.entries(wearables).map(
-            ([mimetype, model]) => (
-              <ListItem key={mimetype}>
-                <a href={httpURL(model)}>{mimetype}</a>
-              </ListItem>
-            )
-          )}
-        </UnorderedList>
-      )}
-    </Container>
+    <>
+      <Helmet>
+        {/* This won't work, more than likely… */}
+        {metadata.image && (
+          <meta property="og:image" content={httpURL(metadata.image)}></meta>
+        )}
+        {metadata.name && (
+          <meta property="og:title" content={metadata.name}></meta>
+        )}
+      </Helmet>
+      <Container sx={{ a: { textDecoration: 'underline' } }}>
+        <Heading size="lg" my={5} align="center">
+          {metadata.name}
+        </Heading>
+        <Flex direction={{ base: 'column', sm: 'row' }} align="center">
+          <Box
+            minW={["100vmin", "50%"]}
+            paddingTop={['100vmin', "50%"]}
+            position="relative" border="2px solid black"
+            alignSelf={['center', 'start']} justifySelf="center"
+          >
+            <Box
+              position="absolute"
+              top={0} bottom={0} left={0} right={0}>
+              {wearables['model/gltf-binary'] ? (
+                <Model/>
+              ) : (
+                <Image src={httpURL(metadata.image)}/>
+              )}
+            </Box>
+          </Box>
+          <Box
+            ml={5} sx={{
+              hr: { my: 3 },
+              'p, li': { mb: 3, textAlign: 'justify' },
+            }}>
+            <ReactMarkdown linkTarget="_blank">
+              {metadata.description}
+            </ReactMarkdown>
+          </Box>
+        </Flex>
+        {homepage && (
+          <Link href={homepage} isExternal title="Homepage">
+            🏡
+          </Link>
+        )}
+        {metadata?.uri && (
+          <Link href={metadata.uri} ml={3} isExternal title="Metadata">
+            🗄
+          </Link>
+        )}
+        <Heading size="sm">Models:</Heading>
+        {Object.keys(wearables).length === 0 ? (
+          <Text><em>None</em></Text>
+        ) : (
+          <UnorderedList>
+            {Object.entries(wearables).map(
+              ([mimetype, model]) => (
+                <ListItem key={mimetype}>
+                  <a href={httpURL(model)}>{mimetype}</a>
+                </ListItem>
+              )
+            )}
+          </UnorderedList>
+        )}
+      </Container>
+    </>
   )
 }
