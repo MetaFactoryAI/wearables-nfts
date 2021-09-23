@@ -14,12 +14,13 @@ import {
 } from './hooks'
 import { Header } from './components'
 import { INFURA_ID, NETWORK, NETWORKS } from './constants'
-import ExistingNFTs from './views/ExistingNFTs'
+import ExistingNFTs from './views/NFTGrid'
 import CreateNFT from './views/CreateNFT'
 import DisburseOrList from './views/DisburseOrList'
 import EditOrList from './views/EditOrList'
 import ViewOrList from './views/ViewOrList'
 import { capitalize } from './helpers'
+import ManageRoles from './views/ManageRoles'
 
 const targetNetwork = NETWORKS['rinkeby']
 const mainnetInfura = (
@@ -138,6 +139,9 @@ export default () => {
           </Route>
           <Route path='/view/:id?'>
             <ViewOrList {...{ desiredNetwork }}/>
+          </Route>
+          <Route path='/manage'>
+            <ManageRoles {...{ desiredNetwork }}/>
           </Route>
           <Route path='/disburse/:id?'>
             <DisburseOrList

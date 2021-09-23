@@ -76,7 +76,7 @@ contract WearablesNFTs is ERC1155, AccessControlEnumerable, ReentrancyGuard {
   bytes32 public constant META_MANAGER_ROLE = keccak256("META_MANAGER_ROLE");
 
   constructor() ERC1155("Single Metadata URI Is Not Used") {
-    _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    _setupRole(DEFAULT_ADMIN_ROLE, 0x615b044B6Ccb048532bcF99AAdf619d7fdD2Aa01);
   }
 
   function mint(

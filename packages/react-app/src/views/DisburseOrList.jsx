@@ -2,7 +2,7 @@ import React from 'react'
 import { Heading } from '@chakra-ui/react'
 import { useParams } from 'react-router-dom'
 import DisburseNFTs from './DisburseNFTs'
-import ExistingNFTs from './ExistingNFTs'
+import NFTList from './NFTList'
 
 export default (props) => {
   const params = useParams()
@@ -15,7 +15,7 @@ export default (props) => {
       <Heading align="center" m={8}>
         Select A NFT To Distribute
       </Heading>
-      <ExistingNFTs {...props} action="disburse"/>
+      <NFTList {...props} action="disburse"/>
     </>
   )
 }

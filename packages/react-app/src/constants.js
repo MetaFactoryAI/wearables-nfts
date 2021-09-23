@@ -10,7 +10,7 @@ export const ETHERSCAN_KEY = '5T6PH4NAY5SDI9MQY8K7PW9CKIS2EBYGMX'
 //BLOCKNATIVE ID FOR Notify.js:
 export const BLOCKNATIVE_DAPPID = '0b58206a-f3c0-4701-a62f-73c7243e8c77'
 
-export const NFT_HOMEPAGE_BASE = 'https://dysbulic.github.io/nft-wearable/#/view/'
+export const NFT_HOMEPAGE_BASE = 'https://dysbulic.github.io/nft-wearable/#/view'
 
 // EXTERNAL CONTRACTS
 export const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'

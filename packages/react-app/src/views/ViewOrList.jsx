@@ -2,22 +2,13 @@ import React from 'react'
 import { Heading } from '@chakra-ui/react'
 import { useParams } from 'react-router-dom'
 import NFTDetails from './NFTDetails'
-import ExistingNFTs from './ExistingNFTs'
+import NFTGrid from './NFTGrid'
 
 export default (props) => {
   const params = useParams()
 
   if(params.id) {
-    return (
-      <NFTDetails {...props}/>
-    )
+    return <NFTDetails {...props}/>
   }
-  return (
-    <>
-      <Heading align="center" m={8}>
-        Select A NFT To View
-      </Heading>
-      <ExistingNFTs action="view"/>
-    </>
-  )
+  return <NFTGrid action="view"/>
 }
